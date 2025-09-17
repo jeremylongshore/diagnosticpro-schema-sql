@@ -1,0 +1,16 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.6.0
+  hooks:
+    - id: check-added-large-files
+      args: ["--maxkb=5120"]   # 5 MB cap
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+    - id: check-yaml
+    - id: mixed-line-ending
+- repo: local
+  hooks:
+    - id: nmd-layout
+      name: nmd-layout
+      entry: bash NMD/tools/check_layout.sh
+      language: system

@@ -180,6 +180,9 @@ jobs:
             NMD/*_report_*.md
           retention-days: 30
 
+      - name: Enforce NMD layout
+        run: bash NMD/tools/check_layout.sh
+
       - name: Comment PR with Results
         if: github.event_name == 'pull_request' && always()
         uses: actions/github-script@v6
