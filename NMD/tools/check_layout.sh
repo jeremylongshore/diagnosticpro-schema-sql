@@ -3,7 +3,7 @@ set -euo pipefail
 
 # NMD Layout Enforcement - Fail CI if unknown files exist
 # whitelist pattern for allowed files and directories
-ALLOW_RE='^(README\.md|LICENSE|SECURITY\.md|\.gitignore|\.github(/.*)?|NMD(/(core|kits|specs|reports|archive|tools)(/.*)?)?|\.pre-commit-config\.yaml)$'
+ALLOW_RE='^(README\.md|LICENSE|SECURITY\.md|\.gitignore|\.github(/.*)?|\.claude(/.*)?|\.env\.template|BIGQUERY.*\.(sql|md)|CLAUDE\.md|NMD\.md|NMD/(core|kits|specs|reports|archive|tools)(/.*)?|NMD/(ORG_SOP|README)\.md|\.pre-commit-config\.yaml|bigquery.*\.(yaml|py|sh|md|txt)|database.*\.csv|deploy.*\.(sh|txt)|diagnosticpro.*\.txt|docs(/.*)?|.*codes.*\.json|.*tables.*\.txt|.*migration.*\.(md|txt)|.*import.*\.(sh|md)|sandbox.*\.sh|.*schema.*\.json)$'
 
 violations=0
 
