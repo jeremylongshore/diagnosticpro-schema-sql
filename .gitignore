@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+
+# Environment
+.env
+.env.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+migration_logs/
+
+# Temp files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+# BigQuery
+*.json
+!*_schema.json
+!*.schema.json
+!*.parquet.json
+!validation_test_cases.json
+
+# Credentials
+service-account*.json
+credentials/
+keys/
+
+# Data files (too large)
+*.parquet
+*.csv.gz
+*.ndjson.gz
+
+# Test output
+test_output/
+validation_results/
+demo_logs/
+
+# Build
+dist/
+build/
+*.egg-info/

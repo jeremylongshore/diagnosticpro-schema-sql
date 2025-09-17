@@ -1,0 +1,337 @@
+{
+  "format": "parquet_equivalent",
+  "note": "This is a JSON representation of the data that would be in Parquet format",
+  "original_file": "youtube_repair_videos.ndjson",
+  "record_count": 5,
+  "data": [
+    {
+      "video_id": "dQw4w9WgXcQ",
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "title": "How to Fix P0301 Misfire - Honda Civic DIY Repair",
+      "description": "Complete guide to diagnosing and fixing a P0301 cylinder 1 misfire code on a 2018 Honda Civic. We'll cover common causes, diagnostic steps, and the repair process.",
+      "channel": "ChrisFix",
+      "channel_id": "UCes1EvRjcKU4sY_UEavndBw",
+      "duration_seconds": 1248,
+      "view_count": 125000,
+      "like_count": 4200,
+      "comment_count": 89,
+      "published_at": "2025-09-15T14:30:00Z",
+      "tags": [
+        "honda civic",
+        "P0301",
+        "misfire",
+        "DIY repair",
+        "automotive"
+      ],
+      "category": "autos_vehicles",
+      "language": "en-US",
+      "transcript": {
+        "has_transcript": true,
+        "transcript_text": "Today we're going to diagnose and fix a P0301 misfire code on this 2018 Honda Civic. First step is to connect our OBD scanner...",
+        "auto_generated": false,
+        "language": "en-US"
+      },
+      "repair_content": {
+        "repair_type": "diagnostic",
+        "difficulty_level": "intermediate",
+        "estimated_time": "2-4 hours",
+        "tools_required": [
+          "OBD scanner",
+          "Socket set",
+          "Multimeter"
+        ],
+        "parts_mentioned": [
+          "Spark plugs",
+          "Ignition coil",
+          "Fuel injector"
+        ],
+        "cost_estimate": 150.0
+      },
+      "vehicle_info": {
+        "make": "Honda",
+        "model": "Civic",
+        "year": 2018,
+        "applicable_years": [
+          2016,
+          2017,
+          2018,
+          2019,
+          2020
+        ]
+      },
+      "diagnostic_codes": [
+        {
+          "code": "P0301",
+          "mention_timestamp": 45
+        }
+      ],
+      "source": "youtube_repair_tutorials",
+      "import_timestamp": "2025-09-17T11:00:00Z"
+    },
+    {
+      "video_id": "aBc123dEfGh",
+      "url": "https://www.youtube.com/watch?v=aBc123dEfGh",
+      "title": "BMW E90 Water Pump Replacement - Complete Guide",
+      "description": "Step-by-step water pump replacement on BMW E90 3 Series. Includes bleeding procedure and common mistakes to avoid. Perfect for BMW owners looking to save money on repairs.",
+      "channel": "BMW Repair Guide",
+      "channel_id": "UC123456789012345678901",
+      "duration_seconds": 2640,
+      "view_count": 87500,
+      "like_count": 2100,
+      "comment_count": 156,
+      "published_at": "2025-09-10T10:15:00Z",
+      "tags": [
+        "BMW E90",
+        "water pump",
+        "cooling system",
+        "repair guide",
+        "N52 engine"
+      ],
+      "category": "autos_vehicles",
+      "language": "en-US",
+      "transcript": {
+        "has_transcript": true,
+        "transcript_text": "Welcome back to BMW Repair Guide. Today we're replacing the water pump on this 2008 BMW 328i with the N52 engine...",
+        "auto_generated": true,
+        "language": "en-US"
+      },
+      "repair_content": {
+        "repair_type": "replacement",
+        "difficulty_level": "advanced",
+        "estimated_time": "4-6 hours",
+        "tools_required": [
+          "Socket set",
+          "Torque wrench",
+          "Coolant pump",
+          "Drain pan"
+        ],
+        "parts_mentioned": [
+          "Water pump",
+          "Thermostat",
+          "Coolant",
+          "Gaskets"
+        ],
+        "cost_estimate": 450.0
+      },
+      "vehicle_info": {
+        "make": "BMW",
+        "model": "328i",
+        "year": 2008,
+        "engine": "N52 3.0L",
+        "applicable_years": [
+          2006,
+          2007,
+          2008,
+          2009,
+          2010,
+          2011
+        ]
+      },
+      "source": "youtube_bmw_specialists",
+      "import_timestamp": "2025-09-10T11:30:00Z"
+    },
+    {
+      "video_id": "xYz789AbCdE",
+      "url": "https://www.youtube.com/watch?v=xYz789AbCdE",
+      "title": "Ford F-150 Transmission Service - Change Fluid & Filter",
+      "description": "Transmission service on 2015 Ford F-150 with 6R80 transmission. Learn how to change fluid, replace filter, and properly torque the pan. Prevent costly transmission repairs!",
+      "channel": "Truck Repair Academy",
+      "channel_id": "UC987654321098765432109",
+      "duration_seconds": 1560,
+      "view_count": 203000,
+      "like_count": 6800,
+      "comment_count": 234,
+      "published_at": "2025-09-08T16:45:00Z",
+      "tags": [
+        "Ford F-150",
+        "transmission service",
+        "6R80",
+        "maintenance",
+        "truck repair"
+      ],
+      "category": "autos_vehicles",
+      "language": "en-US",
+      "transcript": {
+        "has_transcript": false
+      },
+      "repair_content": {
+        "repair_type": "maintenance",
+        "difficulty_level": "intermediate",
+        "estimated_time": "1-2 hours",
+        "tools_required": [
+          "Socket set",
+          "Drain pan",
+          "Funnel",
+          "Torque wrench"
+        ],
+        "parts_mentioned": [
+          "Transmission fluid",
+          "Filter",
+          "Pan gasket"
+        ],
+        "cost_estimate": 85.0
+      },
+      "vehicle_info": {
+        "make": "Ford",
+        "model": "F-150",
+        "year": 2015,
+        "engine": "3.5L EcoBoost",
+        "applicable_years": [
+          2011,
+          2012,
+          2013,
+          2014,
+          2015,
+          2016,
+          2017
+        ]
+      },
+      "source": "youtube_truck_maintenance",
+      "import_timestamp": "2025-09-08T17:15:00Z"
+    },
+    {
+      "video_id": "pQr456StUvW",
+      "url": "https://www.youtube.com/watch?v=pQr456StUvW",
+      "title": "Toyota Prius Hybrid Battery Diagnosis - Is It Dead?",
+      "description": "How to diagnose a failing hybrid battery in a Toyota Prius. We'll use diagnostic tools to check cell voltage and determine if replacement is needed. Save thousands by knowing the facts!",
+      "channel": "Hybrid Repair Pro",
+      "channel_id": "UC456789012345678901234",
+      "duration_seconds": 1890,
+      "view_count": 156000,
+      "like_count": 3400,
+      "comment_count": 298,
+      "published_at": "2025-09-05T13:20:00Z",
+      "tags": [
+        "Toyota Prius",
+        "hybrid battery",
+        "diagnosis",
+        "HV battery",
+        "hybrid repair"
+      ],
+      "category": "autos_vehicles",
+      "language": "en-US",
+      "transcript": {
+        "has_transcript": true,
+        "transcript_text": "Many Prius owners panic when they see hybrid system warnings. Today we'll properly diagnose this 2010 Prius hybrid battery...",
+        "auto_generated": false,
+        "language": "en-US"
+      },
+      "repair_content": {
+        "repair_type": "diagnostic",
+        "difficulty_level": "professional",
+        "estimated_time": "1-3 hours",
+        "tools_required": [
+          "Hybrid scanner",
+          "Multimeter",
+          "Insulated gloves",
+          "Safety equipment"
+        ],
+        "parts_mentioned": [
+          "Hybrid battery pack",
+          "Battery cooling fan",
+          "HV relays"
+        ],
+        "cost_estimate": 3500.0
+      },
+      "vehicle_info": {
+        "make": "Toyota",
+        "model": "Prius",
+        "year": 2010,
+        "applicable_years": [
+          2004,
+          2005,
+          2006,
+          2007,
+          2008,
+          2009,
+          2010,
+          2011
+        ]
+      },
+      "diagnostic_codes": [
+        {
+          "code": "P0A80",
+          "mention_timestamp": 320
+        },
+        {
+          "code": "P3000",
+          "mention_timestamp": 456
+        }
+      ],
+      "source": "youtube_hybrid_experts",
+      "import_timestamp": "2025-09-05T14:00:00Z"
+    },
+    {
+      "video_id": "mNb567OpQrS",
+      "url": "https://www.youtube.com/watch?v=mNb567OpQrS",
+      "title": "Diesel Particulate Filter Cleaning - VW TDI",
+      "description": "Deep cleaning procedure for clogged DPF on Volkswagen TDI engines. Learn the forced regeneration process and manual cleaning techniques. Avoid expensive dealer replacement!",
+      "channel": "Diesel Tech Solutions",
+      "channel_id": "UC789012345678901234567",
+      "duration_seconds": 2100,
+      "view_count": 94000,
+      "like_count": 2800,
+      "comment_count": 187,
+      "published_at": "2025-09-02T11:10:00Z",
+      "tags": [
+        "VW TDI",
+        "DPF cleaning",
+        "diesel repair",
+        "particulate filter",
+        "regen"
+      ],
+      "category": "autos_vehicles",
+      "language": "en-US",
+      "transcript": {
+        "has_transcript": true,
+        "transcript_text": "DPF issues are common on VW TDI engines. Before you spend $4000 on a new filter, try this cleaning procedure...",
+        "auto_generated": true,
+        "language": "en-US"
+      },
+      "repair_content": {
+        "repair_type": "troubleshooting",
+        "difficulty_level": "advanced",
+        "estimated_time": "3-5 hours",
+        "tools_required": [
+          "OBD scanner",
+          "DPF cleaning kit",
+          "Air compressor",
+          "Safety equipment"
+        ],
+        "parts_mentioned": [
+          "DPF filter",
+          "Pressure sensors",
+          "Exhaust fluid"
+        ],
+        "cost_estimate": 200.0
+      },
+      "vehicle_info": {
+        "make": "Volkswagen",
+        "model": "Jetta TDI",
+        "year": 2013,
+        "engine": "2.0L TDI",
+        "applicable_years": [
+          2009,
+          2010,
+          2011,
+          2012,
+          2013,
+          2014,
+          2015
+        ]
+      },
+      "diagnostic_codes": [
+        {
+          "code": "P2002",
+          "mention_timestamp": 180
+        },
+        {
+          "code": "P2463",
+          "mention_timestamp": 540
+        }
+      ],
+      "source": "youtube_diesel_specialists",
+      "import_timestamp": "2025-09-02T12:00:00Z"
+    }
+  ]
+}

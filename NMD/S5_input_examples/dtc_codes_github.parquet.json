@@ -1,0 +1,339 @@
+{
+  "format": "parquet_equivalent",
+  "note": "This is a JSON representation of the data that would be in Parquet format",
+  "original_file": "dtc_codes_github.ndjson",
+  "record_count": 5,
+  "data": [
+    {
+      "dtc_code": "P0301",
+      "description": "Cylinder 1 Misfire Detected - Engine misfiring in cylinder 1",
+      "category": "P",
+      "subcategory": "ignition_system",
+      "severity": "major",
+      "system": "engine",
+      "common_causes": [
+        "Faulty spark plug",
+        "Bad ignition coil",
+        "Fuel injector issues"
+      ],
+      "symptoms": [
+        "Engine shake",
+        "Poor acceleration",
+        "Check engine light"
+      ],
+      "diagnostic_steps": [
+        "Check spark plug condition",
+        "Test ignition coil resistance",
+        "Check fuel injector operation"
+      ],
+      "potential_solutions": [
+        "Replace spark plug",
+        "Replace ignition coil",
+        "Clean fuel injector"
+      ],
+      "related_codes": [
+        "P0302",
+        "P0303",
+        "P0304"
+      ],
+      "source": "github_obd_codes_db",
+      "source_details": {
+        "repository_url": "https://github.com/automotive/obd-codes",
+        "repository_name": "obd-codes",
+        "file_path": "codes/powertrain/P0301.json",
+        "commit_hash": "abc123def456789012345678901234567890abcd",
+        "branch": "main",
+        "author": "automotive-team",
+        "license": "MIT"
+      },
+      "vehicle_compatibility": {
+        "makes": [
+          "Honda",
+          "Toyota",
+          "Ford"
+        ],
+        "models": [
+          "Civic",
+          "Camry",
+          "Focus"
+        ],
+        "year_ranges": [
+          {
+            "start_year": 2010,
+            "end_year": 2023
+          }
+        ],
+        "engine_types": [
+          "4-cylinder gasoline"
+        ]
+      },
+      "extraction_date": "2025-09-17T10:30:00Z",
+      "import_timestamp": "2025-09-17T10:35:00Z"
+    },
+    {
+      "dtc_code": "B1342",
+      "description": "Driver Side Airbag Circuit Resistance Too High",
+      "category": "B",
+      "subcategory": "airbag_system",
+      "severity": "critical",
+      "system": "airbag_srs",
+      "common_causes": [
+        "Damaged airbag wiring",
+        "Faulty airbag module",
+        "Connector corrosion"
+      ],
+      "symptoms": [
+        "Airbag warning light",
+        "SRS system disabled"
+      ],
+      "diagnostic_steps": [
+        "Check airbag connector",
+        "Measure circuit resistance",
+        "Inspect wiring harness"
+      ],
+      "potential_solutions": [
+        "Repair wiring",
+        "Replace airbag module",
+        "Clean connectors"
+      ],
+      "related_codes": [
+        "B1343",
+        "B1344"
+      ],
+      "source": "github_airbag_codes",
+      "source_details": {
+        "repository_url": "https://github.com/safety-systems/airbag-dtc",
+        "repository_name": "airbag-dtc",
+        "file_path": "body/B1342.yaml",
+        "commit_hash": "def456abc789012345678901234567890abcdef",
+        "branch": "develop",
+        "author": "safety-engineer",
+        "license": "Apache-2.0"
+      },
+      "vehicle_compatibility": {
+        "makes": [
+          "BMW",
+          "Mercedes",
+          "Audi"
+        ],
+        "models": [
+          "3 Series",
+          "C-Class",
+          "A4"
+        ],
+        "year_ranges": [
+          {
+            "start_year": 2015,
+            "end_year": 2024
+          }
+        ],
+        "engine_types": [
+          "Various"
+        ]
+      },
+      "extraction_date": "2025-09-17T09:15:00Z",
+      "import_timestamp": "2025-09-17T09:20:00Z"
+    },
+    {
+      "dtc_code": "C0035",
+      "description": "Left Front Wheel Speed Sensor Circuit Malfunction",
+      "category": "C",
+      "subcategory": "abs_system",
+      "severity": "moderate",
+      "system": "abs_brakes",
+      "common_causes": [
+        "Damaged wheel speed sensor",
+        "Dirty sensor ring",
+        "Wiring issues"
+      ],
+      "symptoms": [
+        "ABS warning light",
+        "Reduced braking performance",
+        "Traction control disabled"
+      ],
+      "diagnostic_steps": [
+        "Check sensor wiring",
+        "Clean sensor and tone ring",
+        "Test sensor output voltage"
+      ],
+      "potential_solutions": [
+        "Replace wheel speed sensor",
+        "Clean sensor area",
+        "Repair wiring"
+      ],
+      "related_codes": [
+        "C0036",
+        "C0040",
+        "C0041"
+      ],
+      "source": "github_brake_systems",
+      "source_details": {
+        "repository_url": "https://github.com/brake-tech/abs-codes",
+        "repository_name": "abs-codes",
+        "file_path": "chassis/wheel_speed/C0035.md",
+        "commit_hash": "789abc012345678901234567890abcdef456789",
+        "branch": "main",
+        "author": "brake-specialist",
+        "license": "GPL-3.0"
+      },
+      "vehicle_compatibility": {
+        "makes": [
+          "Chevrolet",
+          "GMC",
+          "Cadillac"
+        ],
+        "models": [
+          "Silverado",
+          "Sierra",
+          "Escalade"
+        ],
+        "year_ranges": [
+          {
+            "start_year": 2007,
+            "end_year": 2020
+          }
+        ],
+        "engine_types": [
+          "V8 gasoline",
+          "V6 gasoline"
+        ]
+      },
+      "extraction_date": "2025-09-17T11:45:00Z",
+      "import_timestamp": "2025-09-17T11:50:00Z"
+    },
+    {
+      "dtc_code": "U0100",
+      "description": "Lost Communication With ECM/PCM 'A'",
+      "category": "U",
+      "subcategory": "communication",
+      "severity": "critical",
+      "system": "communication_bus",
+      "common_causes": [
+        "Faulty ECM/PCM",
+        "CAN bus wiring issues",
+        "Bad ground connection"
+      ],
+      "symptoms": [
+        "No start condition",
+        "Multiple warning lights",
+        "Engine stalling"
+      ],
+      "diagnostic_steps": [
+        "Check CAN bus voltage",
+        "Inspect ECM connectors",
+        "Test ground circuits"
+      ],
+      "potential_solutions": [
+        "Replace ECM/PCM",
+        "Repair CAN bus wiring",
+        "Fix ground connections"
+      ],
+      "related_codes": [
+        "U0101",
+        "U0102",
+        "U0103"
+      ],
+      "source": "github_network_protocols",
+      "source_details": {
+        "repository_url": "https://github.com/can-bus/diagnostic-codes",
+        "repository_name": "diagnostic-codes",
+        "file_path": "network/can_bus/U0100.json",
+        "commit_hash": "012345678901234567890abcdef456789abc123",
+        "branch": "master",
+        "author": "network-engineer",
+        "license": "BSD-3-Clause"
+      },
+      "vehicle_compatibility": {
+        "makes": [
+          "Ford",
+          "Lincoln",
+          "Mercury"
+        ],
+        "models": [
+          "F-150",
+          "Navigator",
+          "Grand Marquis"
+        ],
+        "year_ranges": [
+          {
+            "start_year": 2003,
+            "end_year": 2019
+          }
+        ],
+        "engine_types": [
+          "V8 gasoline",
+          "V6 gasoline",
+          "Diesel"
+        ]
+      },
+      "extraction_date": "2025-09-17T08:20:00Z",
+      "import_timestamp": "2025-09-17T08:25:00Z"
+    },
+    {
+      "dtc_code": "P2004",
+      "description": "Intake Manifold Runner Control Stuck Open Bank 1",
+      "category": "P",
+      "subcategory": "intake_system",
+      "severity": "minor",
+      "system": "engine",
+      "common_causes": [
+        "Carbon buildup",
+        "Faulty actuator motor",
+        "Vacuum leak"
+      ],
+      "symptoms": [
+        "Reduced power at low RPM",
+        "Rough idle",
+        "Poor fuel economy"
+      ],
+      "diagnostic_steps": [
+        "Check actuator operation",
+        "Inspect for carbon deposits",
+        "Test vacuum lines"
+      ],
+      "potential_solutions": [
+        "Clean intake manifold",
+        "Replace actuator motor",
+        "Repair vacuum lines"
+      ],
+      "related_codes": [
+        "P2005",
+        "P2006",
+        "P2007"
+      ],
+      "source": "github_intake_systems",
+      "source_details": {
+        "repository_url": "https://github.com/engine-tech/intake-manifold",
+        "repository_name": "intake-manifold",
+        "file_path": "powertrain/intake/P2004.xml",
+        "commit_hash": "456789abc012345678901234567890def123abc",
+        "branch": "release",
+        "author": "intake-specialist",
+        "license": "MIT"
+      },
+      "vehicle_compatibility": {
+        "makes": [
+          "Volkswagen",
+          "Audi",
+          "Porsche"
+        ],
+        "models": [
+          "Golf",
+          "A3",
+          "Boxster"
+        ],
+        "year_ranges": [
+          {
+            "start_year": 2012,
+            "end_year": 2022
+          }
+        ],
+        "engine_types": [
+          "Turbocharged gasoline"
+        ]
+      },
+      "extraction_date": "2025-09-17T14:10:00Z",
+      "import_timestamp": "2025-09-17T14:15:00Z"
+    }
+  ]
+}

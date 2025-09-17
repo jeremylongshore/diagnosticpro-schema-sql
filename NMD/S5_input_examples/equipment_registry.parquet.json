@@ -1,0 +1,223 @@
+{
+  "format": "parquet_equivalent",
+  "note": "This is a JSON representation of the data that would be in Parquet format",
+  "original_file": "equipment_registry.ndjson",
+  "record_count": 5,
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "identification_primary_type": "vin",
+      "identification_primary": "1HGBH41JXMN109186",
+      "equipment_category": "automotive",
+      "equipment_details": {
+        "manufacturer": "Honda",
+        "model": "Accord",
+        "model_year": 2022,
+        "color": "Silver",
+        "description": "2022 Honda Accord LX Sedan"
+      },
+      "physical": {
+        "weight_lbs": 3131,
+        "dimensions_inches": {
+          "length": 192.2,
+          "width": 73.3,
+          "height": 57.1
+        }
+      },
+      "economics": {
+        "original_msrp": 25000.0,
+        "currency_code": "USD",
+        "depreciation_rate": 0.15
+      },
+      "power": {
+        "horsepower": 192
+      },
+      "ownership": {
+        "gps_coordinates": {
+          "latitude": 40.7128,
+          "longitude": -74.006
+        }
+      },
+      "registration": {
+        "registration_number": "ABC1234",
+        "registration_state": "NY",
+        "registration_expiry": "2026-09-15"
+      },
+      "is_active": true,
+      "created_at": "2025-09-17T12:00:00Z",
+      "updated_at": "2025-09-17T12:00:00Z"
+    },
+    {
+      "id": "660f9511-f3ac-52e5-b827-557766551111",
+      "identification_primary_type": "vin",
+      "identification_primary": "WBAVA37508NM12345",
+      "equipment_category": "automotive",
+      "equipment_details": {
+        "manufacturer": "BMW",
+        "model": "328i",
+        "model_year": 2008,
+        "color": "Black",
+        "description": "2008 BMW 328i Sedan with Sport Package"
+      },
+      "physical": {
+        "weight_lbs": 3450,
+        "dimensions_inches": {
+          "length": 178.2,
+          "width": 71.5,
+          "height": 56.8
+        }
+      },
+      "economics": {
+        "original_msrp": 35000.0,
+        "currency_code": "USD",
+        "depreciation_rate": 0.22
+      },
+      "power": {
+        "horsepower": 230
+      },
+      "ownership": {
+        "gps_coordinates": {
+          "latitude": 34.0522,
+          "longitude": -118.2437
+        }
+      },
+      "registration": {
+        "registration_number": "DEF5678",
+        "registration_state": "CA",
+        "registration_expiry": "2025-12-31"
+      },
+      "is_active": true,
+      "created_at": "2025-09-16T10:30:00Z",
+      "updated_at": "2025-09-17T08:15:00Z"
+    },
+    {
+      "id": "770a8622-04bd-63f6-c938-668877662222",
+      "identification_primary_type": "serial_number",
+      "identification_primary": "CAT-1234567890",
+      "equipment_category": "heavy_equipment",
+      "equipment_details": {
+        "manufacturer": "Caterpillar",
+        "model": "320 Excavator",
+        "model_year": 2019,
+        "color": "Yellow",
+        "description": "320 Hydraulic Excavator with GPS"
+      },
+      "physical": {
+        "weight_lbs": 45000,
+        "dimensions_inches": {
+          "length": 378,
+          "width": 118,
+          "height": 118
+        }
+      },
+      "economics": {
+        "original_msrp": 450000.0,
+        "currency_code": "USD",
+        "depreciation_rate": 0.18
+      },
+      "power": {
+        "horsepower": 158
+      },
+      "ownership": {
+        "owner_id": "880b9733-15ce-74g7-d049-779988773333",
+        "gps_coordinates": {
+          "latitude": 39.7392,
+          "longitude": -104.9903
+        }
+      },
+      "registration": {
+        "registration_number": "HE-789012",
+        "registration_state": "CO",
+        "registration_expiry": "2026-03-31"
+      },
+      "is_active": true,
+      "created_at": "2025-09-15T14:20:00Z",
+      "updated_at": "2025-09-17T09:45:00Z"
+    },
+    {
+      "id": "880c9744-26df-85h8-e15a-88aa99884444",
+      "identification_primary_type": "imei",
+      "identification_primary": "352099001761481",
+      "equipment_category": "electronics",
+      "equipment_details": {
+        "manufacturer": "Apple",
+        "model": "iPhone 14 Pro",
+        "model_year": 2023,
+        "color": "Space Black",
+        "description": "iPhone 14 Pro 256GB with MagSafe"
+      },
+      "physical": {
+        "weight_lbs": 0.45,
+        "dimensions_inches": {
+          "length": 6.33,
+          "width": 3.05,
+          "height": 0.31
+        }
+      },
+      "economics": {
+        "original_msrp": 1199.0,
+        "currency_code": "USD",
+        "depreciation_rate": 0.35
+      },
+      "power": {
+        "voltage_primary": 5,
+        "amperage_max": 3.0
+      },
+      "ownership": {
+        "owner_id": "990d0855-37e0-96i9-f26b-99bb00995555",
+        "gps_coordinates": {
+          "latitude": 37.7749,
+          "longitude": -122.4194
+        }
+      },
+      "is_active": true,
+      "created_at": "2025-09-14T11:00:00Z",
+      "updated_at": "2025-09-16T16:30:00Z"
+    },
+    {
+      "id": "990e1966-48f1-a7j0-027c-aaccbbaa6666",
+      "identification_primary_type": "asset_tag",
+      "identification_primary": "GE-TURBINE-TX-001",
+      "equipment_category": "machinery",
+      "equipment_details": {
+        "manufacturer": "General Electric",
+        "model": "LM2500",
+        "model_year": 2020,
+        "description": "Gas Turbine Generator for Power Plant"
+      },
+      "physical": {
+        "weight_lbs": 25000,
+        "dimensions_inches": {
+          "length": 240,
+          "width": 120,
+          "height": 144
+        }
+      },
+      "economics": {
+        "original_msrp": 8500000.0,
+        "currency_code": "USD",
+        "depreciation_rate": 0.08
+      },
+      "power": {
+        "horsepower": 33600,
+        "voltage_primary": 13800,
+        "amperage_max": 2500
+      },
+      "ownership": {
+        "organization_id": "aa1f2a77-59g2-b8k1-138d-bbddccbb7777",
+        "gps_coordinates": {
+          "latitude": 29.7604,
+          "longitude": -95.3698
+        }
+      },
+      "registration": {
+        "registration_number": "PWR-TX-001",
+        "registration_state": "TX",
+        "registration_expiry": "2030-06-15"
+      },
+      "is_active": true,
+      "created_at": "2025-09-12T09:15:00Z",
+      "updated_at": "2025-09-17T07:20:00Z"
+    }
+  ]
+}

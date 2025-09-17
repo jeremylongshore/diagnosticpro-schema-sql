@@ -1,0 +1,374 @@
+# S2 - SLA and Retention Policies for DiagnosticPro BigQuery Platform
+# Generated: 2025-09-16
+# Project: diagnostic-pro-start-up
+# Environment: Google BigQuery Production
+
+metadata:
+  version: "1.0.0"
+  last_updated: "2025-09-16"
+  review_cycle: "quarterly"
+  owner: "data-engineering-team"
+  approved_by: "platform-architecture"
+
+# =============================================================================
+# DATA FRESHNESS SLAs
+# =============================================================================
+
+freshness_slas:
+  # Live Data Sources (Tables with Current Data)
+  live_data_tables:
+    dtc_codes_github:
+      expected_cadence: "daily"
+      max_staleness: "48h"
+      late_arrival_threshold: "24h"
+      data_type: "batch_scraped"
+      current_volume: 1000
+      source: "GitHub repositories scraping"
+      criticality: "high"
+
+    reddit_diagnostic_posts:
+      expected_cadence: "hourly"
+      max_staleness: "6h"
+      late_arrival_threshold: "3h"
+      data_type: "batch_scraped"
+      current_volume: 11462
+      source: "Reddit API scraping"
+      criticality: "high"
+
+    youtube_repair_videos:
+      expected_cadence: "daily"
+      max_staleness: "24h"
+      late_arrival_threshold: "12h"
+      data_type: "batch_scraped"
+      current_volume: 1000
+      source: "YouTube API scraping"
+      criticality: "medium"
+
+    equipment_registry:
+      expected_cadence: "on_demand"
+      max_staleness: "7d"
+      late_arrival_threshold: "24h"
+      data_type: "transactional"
+      current_volume: 1
+      source: "Equipment registration system"
+      criticality: "critical"
+
+  # High-Volume Time-Series Data
+  sensor_telemetry:
+    expected_cadence: "real_time"
+    max_staleness: "5m"
+    late_arrival_threshold: "30s"
+    data_type: "streaming_sensor"
+    source: "IoT sensors and OBD-II devices"
+    criticality: "critical"
+    partition_strategy: "hourly"
+
+  # Business Critical Tables
+  diagnostic_sessions:
+    expected_cadence: "real_time"
+    max_staleness: "1m"
+    late_arrival_threshold: "10s"
+    data_type: "transactional"
+    source: "Diagnostic platform sessions"
+    criticality: "critical"
+
+  users:
+    expected_cadence: "real_time"
+    max_staleness: "30s"
+    late_arrival_threshold: "5s"
+    data_type: "transactional"
+    source: "User registration and profile updates"
+    criticality: "critical"
+
+  # ML Pipeline Tables
+  feature_store:
+    expected_cadence: "hourly"
+    max_staleness: "2h"
+    late_arrival_threshold: "30m"
+    data_type: "computed_features"
+    source: "ML feature engineering pipeline"
+    criticality: "high"
+
+  models:
+    expected_cadence: "daily"
+    max_staleness: "24h"
+    late_arrival_threshold: "4h"
+    data_type: "ml_artifacts"
+    source: "ML model training pipeline"
+    criticality: "medium"
+
+  maintenance_predictions:
+    expected_cadence: "daily"
+    max_staleness: "48h"
+    late_arrival_threshold: "12h"
+    data_type: "ml_predictions"
+    source: "Predictive maintenance algorithms"
+    criticality: "medium"
+
+  # Business Operations
+  parts_inventory:
+    expected_cadence: "hourly"
+    max_staleness: "4h"
+    late_arrival_threshold: "1h"
+    data_type: "inventory_updates"
+    source: "Parts management system"
+    criticality: "high"
+
+# =============================================================================
+# DATA RETENTION POLICIES
+# =============================================================================
+
+retention_policies:
+  # Existing Defined Retentions
+  sensor_telemetry:
+    retention_days: 730
+    reason: "IoT sensor data for trend analysis and diagnostics"
+    partition_expiration: true
+    archive_policy: "cold_storage_after_90_days"
+
+  feature_store:
+    retention_days: 90
+    reason: "ML features with rapid iteration cycle"
+    partition_expiration: true
+    archive_policy: "delete_after_retention"
+
+  diagnostic_sessions:
+    retention_days: 2555  # ~7 years
+    reason: "Legal compliance and warranty tracking"
+    partition_expiration: true
+    archive_policy: "long_term_archive"
+
+  # Default Retention (3650 days = 10 years)
+  default_retention:
+    retention_days: 3650
+    reason: "Standard business record retention"
+    applies_to:
+      - "All tables not explicitly defined"
+      - "Business transaction records"
+      - "User data and profiles"
+      - "Equipment registry"
+
+  # Category-Specific Retentions
+  scraped_data:
+    dtc_codes_github:
+      retention_days: 1825  # 5 years
+      reason: "Technical reference data with medium refresh rate"
+    reddit_diagnostic_posts:
+      retention_days: 1095  # 3 years
+      reason: "Community content with decreasing relevance"
+    youtube_repair_videos:
+      retention_days: 1825  # 5 years
+      reason: "Educational content with lasting value"
+
+  financial_records:
+    retention_days: 2555  # 7 years
+    reason: "Financial compliance and audit requirements"
+    tables_pattern: "*billing*, *payment*, *invoice*, *subscription*"
+    archive_policy: "encrypted_long_term_storage"
+
+  audit_logs:
+    retention_days: 2190  # 6 years
+    reason: "Security audit and compliance"
+    tables_pattern: "*_log, *_audit, api_access_log"
+    archive_policy: "immutable_archive"
+
+  temporary_data:
+    retention_days: 30
+    reason: "Temporary processing and staging data"
+    tables_pattern: "*_temp, *_staging, *_processing"
+    archive_policy: "delete_after_retention"
+
+  ml_experiments:
+    retention_days: 365
+    reason: "ML model experiments and A/B tests"
+    tables_pattern: "*_experiment*, *_test_*, model_versions"
+    archive_policy: "compress_and_archive"
+
+# =============================================================================
+# COST OPTIMIZATION POLICIES
+# =============================================================================
+
+cost_optimization:
+  partitioning_strategy:
+    high_volume_tables:
+      - sensor_telemetry
+      - diagnostic_sessions
+      - api_access_log
+      - reddit_diagnostic_posts
+    partition_type: "time_based"
+    partition_field: "created_at"
+    partition_granularity: "daily"
+
+  clustering_optimization:
+    sensor_telemetry: ["equipment_id", "sensor_type"]
+    diagnostic_sessions: ["user_id", "equipment_id"]
+    reddit_diagnostic_posts: ["created_date", "subreddit"]
+    dtc_codes_github: ["make", "model", "year"]
+
+  storage_classes:
+    hot_storage:
+      duration: "30 days"
+      tables: ["sensor_telemetry", "diagnostic_sessions", "users"]
+
+    nearline_storage:
+      duration: "90 days"
+      tables: ["scraped_data_*", "feature_store"]
+
+    coldline_storage:
+      duration: "365 days"
+      tables: ["audit_logs", "*_archive"]
+
+    archive_storage:
+      duration: "permanent"
+      tables: ["financial_records", "legal_compliance_*"]
+
+# =============================================================================
+# REGULATORY COMPLIANCE
+# =============================================================================
+
+compliance:
+  gdpr:
+    user_data_retention: 2555  # 7 years max
+    right_to_erasure: true
+    tables_affected: ["users", "diagnostic_sessions", "*_profile*"]
+    anonymization_policy: "after_90_days_inactive"
+
+  automotive_regulations:
+    warranty_data_retention: 2555  # 7 years
+    safety_recall_data: 3650  # 10 years
+    tables_affected: ["equipment_registry", "diagnostic_sessions", "parts_inventory"]
+
+  financial_compliance:
+    sox_compliance: 2555  # 7 years
+    pci_compliance: 1095  # 3 years for payment data
+    tables_affected: ["*billing*", "*payment*", "*financial*"]
+
+# =============================================================================
+# CHANGE MANAGEMENT POLICIES
+# =============================================================================
+
+change_management:
+  schema_versioning:
+    version_format: "YYYY.MM.DD.HH"
+    backward_compatibility: "mandatory"
+    deprecation_notice: "90 days minimum"
+
+  table_lifecycle:
+    development:
+      naming_pattern: "dev_*"
+      auto_cleanup: "7 days"
+
+    staging:
+      naming_pattern: "staging_*"
+      auto_cleanup: "30 days"
+
+    production:
+      naming_pattern: "production tables (no prefix)"
+      change_approval: "required"
+      rollback_plan: "mandatory"
+
+  deprecation_process:
+    notice_period: "90 days"
+    migration_support: "180 days"
+    data_export_window: "30 days post-deprecation"
+
+    phases:
+      announcement:
+        duration: "90 days"
+        actions: ["documentation_update", "stakeholder_notification"]
+
+      migration:
+        duration: "90 days"
+        actions: ["dual_write", "validation", "gradual_cutover"]
+
+      sunset:
+        duration: "30 days"
+        actions: ["final_export", "table_deletion", "cleanup"]
+
+# =============================================================================
+# MONITORING AND ALERTING
+# =============================================================================
+
+monitoring:
+  freshness_monitoring:
+    check_frequency: "5 minutes"
+    alert_thresholds:
+      warning: "50% of max_staleness"
+      critical: "100% of max_staleness"
+
+  data_quality_checks:
+    row_count_anomalies: "±20% from historical average"
+    schema_drift_detection: "enabled"
+    duplicate_detection: "enabled for primary keys"
+
+  cost_monitoring:
+    daily_spend_alert: "$100"
+    monthly_budget_alert: "$2000"
+    slot_usage_alert: "80% of allocation"
+
+  retention_enforcement:
+    check_frequency: "daily"
+    automated_cleanup: "enabled"
+    manual_approval_required: "tables > 1TB"
+
+# =============================================================================
+# EMERGENCY PROCEDURES
+# =============================================================================
+
+emergency_procedures:
+  data_recovery:
+    backup_retention: "90 days"
+    point_in_time_recovery: "7 days"
+    cross_region_backup: "enabled for critical tables"
+
+  incident_response:
+    data_loss_notification: "immediate"
+    service_degradation_threshold: "5% of SLA violation"
+    escalation_matrix:
+      - "data_engineer: 0-15 minutes"
+      - "senior_engineer: 15-30 minutes"
+      - "platform_lead: 30-60 minutes"
+      - "cto: 60+ minutes"
+
+  business_continuity:
+    critical_table_priority:
+      tier_1: ["users", "diagnostic_sessions", "equipment_registry"]
+      tier_2: ["sensor_telemetry", "parts_inventory"]
+      tier_3: ["scraped_data_*", "feature_store"]
+
+    recovery_time_objectives:
+      tier_1: "15 minutes"
+      tier_2: "1 hour"
+      tier_3: "4 hours"
+
+# =============================================================================
+# PERFORMANCE TARGETS
+# =============================================================================
+
+performance_targets:
+  query_performance:
+    p95_latency: "2 seconds"
+    p99_latency: "10 seconds"
+    concurrent_queries: "100"
+
+  data_ingestion:
+    throughput: "100MB/minute"
+    batch_processing: "10,000 records/second"
+    streaming_latency: "< 1 second"
+
+  availability:
+    uptime_sla: "99.9%"
+    planned_maintenance_window: "Sunday 2-4 AM PST"
+    unplanned_downtime_budget: "8.76 hours/year"
+
+---
+# Document Metadata
+generated_date: "2025-09-16"
+schema_version: "1.0.0"
+next_review_date: "2025-12-16"
+stakeholders:
+  - "data-engineering-team"
+  - "platform-architecture"
+  - "compliance-team"
+  - "finance-team"
+approval_status: "draft"

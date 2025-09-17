@@ -1,0 +1,21 @@
+# S4 Validation Runner Dependencies
+# Core BigQuery and cloud dependencies
+google-cloud-bigquery>=3.11.0
+google-api-core>=2.11.0
+
+# Schema validation
+jsonschema>=4.19.0
+
+# Configuration parsing
+PyYAML>=6.0
+
+# Progress bars and CLI enhancement
+tqdm>=4.65.0
+
+# Optional: Enhanced logging and formatting
+colorama>=0.4.6
+tabulate>=0.9.0
+
+# Development and testing dependencies (optional)
+pytest>=7.4.0
+pytest-cov>=4.1.0

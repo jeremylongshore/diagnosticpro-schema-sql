@@ -1,0 +1,1074 @@
+# S2 - BigQuery Data Quality Rules
+# Generated: 2025-09-16
+# Comprehensive quality rules for diagnostic platform data validation
+
+metadata:
+  version: "2.0"
+  description: "Data quality validation rules for BigQuery diagnostic platform"
+  applies_to:
+    - core_tables: 8  # Full schema definitions
+    - data_tables: 4  # Tables with actual data
+  validation_scope:
+    - schema_compliance
+    - data_integrity
+    - business_rules
+    - performance_optimization
+
+# ================================
+# GLOBAL QUALITY RULES
+# ================================
+
+global_rules:
+  # Universal data patterns
+  patterns:
+    uuid_v4: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+    dtc_code: '^[PBCU]\d{4}$'
+    vin_format: '^[A-HJ-NPR-Z0-9]{17}$'
+    email_format: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    youtube_video_id: '^[a-zA-Z0-9_-]{11}$'
+    reddit_url: '^https?://(?:www\.)?reddit\.com/r/.+'
+    github_url: '^https://github\.com/.+'
+    phone_format: '^\+?[\d\s\-\(\)]{10,20}$'
+    currency_code: '^[A-Z]{3}$'
+    timezone: '^[A-Za-z]+/[A-Za-z_]+$'
+    country_code: '^[A-Z]{2}$'
+
+  # Universal timestamp validation
+  timestamps:
+    created_at:
+      not_null: true
+      not_future: true
+      default_value: "CURRENT_TIMESTAMP()"
+    updated_at:
+      not_null: true
+      not_before_created: true
+      default_value: "CURRENT_TIMESTAMP()"
+    deleted_at:
+      nullable: true
+      soft_delete_indicator: true
+
+  # Common enum validations
+  enums:
+    boolean_nullable:
+      values: [true, false, null]
+    user_types:
+      values: ['customer', 'technician', 'administrator', 'shop_owner', 'fleet_manager']
+    equipment_categories:
+      values: ['automotive', 'heavy_equipment', 'electronics', 'machinery', 'appliances', 'marine', 'agricultural']
+    session_statuses:
+      values: ['pending', 'in_progress', 'completed', 'cancelled']
+    risk_levels:
+      values: ['low', 'medium', 'high', 'critical']
+    reading_quality:
+      values: ['good', 'uncertain', 'bad', 'not_available']
+
+  # File validation rules
+  file_validation:
+    max_file_size_mb: 100
+    required_compression: ['gzip', 'brotli']
+    naming_pattern: '^[a-z0-9_]+\.(json|ndjson)\.gz$'
+    encoding: 'UTF-8'
+    line_terminator: '\n'
+
+# ================================
+# CORE TABLES - FULL DEFINITIONS
+# ================================
+
+tables:
+  # =====================================
+  # 1. USERS TABLE
+  # =====================================
+  users:
+    description: "User authentication and profile management"
+
+    # Primary key and unique constraints
+    primary_key:
+      - id
+    unique_constraints:
+      - email
+
+    # Field-level validations
+    fields:
+      id:
+        type: STRING
+        nullable: false
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+        description: "UUID v4 primary identifier"
+
+      email:
+        type: STRING
+        nullable: false
+        pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        max_length: 254
+        unique: true
+
+      email_verified:
+        type: BOOL
+        nullable: true
+        default: false
+
+      email_verified_at:
+        type: TIMESTAMP
+        nullable: true
+        validation:
+          - not_before_field: created_at
+          - require_when: email_verified = true
+
+      password_hash:
+        type: STRING
+        nullable: false
+        min_length: 60  # bcrypt hash length
+        max_length: 255
+
+      user_type:
+        type: STRING
+        nullable: false
+        enum: ['customer', 'technician', 'administrator', 'shop_owner', 'fleet_manager']
+
+      # Nested profile validation
+      'profile.first_name':
+        type: STRING
+        nullable: true
+        max_length: 100
+
+      'profile.last_name':
+        type: STRING
+        nullable: true
+        max_length: 100
+
+      'profile.phone':
+        type: STRING
+        nullable: true
+        pattern: '^\+?[\d\s\-\(\)]{10,20}$'
+
+      'profile.timezone':
+        type: STRING
+        nullable: true
+        pattern: '^[A-Za-z]+/[A-Za-z_]+$'
+
+      'profile.country':
+        type: STRING
+        nullable: true
+        pattern: '^[A-Z]{2}$'
+
+      # Auth security validation
+      'auth.mfa_enabled':
+        type: BOOL
+        nullable: true
+        default: false
+
+      'auth.failed_login_attempts':
+        type: INT64
+        nullable: true
+        min_value: 0
+        max_value: 10
+        default: 0
+
+      'auth.locked_until':
+        type: TIMESTAMP
+        nullable: true
+        validation:
+          - not_before_field: created_at
+
+      last_login_at:
+        type: TIMESTAMP
+        nullable: true
+        validation:
+          - not_before_field: created_at
+
+      is_active:
+        type: BOOL
+        nullable: true
+        default: true
+
+    # Business rules
+    business_rules:
+      - rule: "email_verified_at must be set when email_verified is true"
+        sql: "email_verified IS FALSE OR email_verified_at IS NOT NULL"
+      - rule: "locked users must have locked_until timestamp"
+        sql: "auth.failed_login_attempts < 5 OR auth.locked_until IS NOT NULL"
+      - rule: "deleted users cannot be active"
+        sql: "deleted_at IS NULL OR is_active IS FALSE"
+
+    # Idempotency and upsert
+    upsert_key: email
+    idempotency_window_hours: 24
+
+    # Data freshness
+    freshness:
+      expected_delay_hours: 1
+      max_delay_hours: 24
+
+  # =====================================
+  # 2. EQUIPMENT REGISTRY
+  # =====================================
+  equipment_registry:
+    description: "Universal equipment tracking and management"
+
+    primary_key:
+      - id
+    unique_constraints:
+      - identification_primary
+
+    fields:
+      id:
+        type: STRING
+        nullable: false
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+
+      identification_primary_type:
+        type: STRING
+        nullable: false
+        enum: ['vin', 'serial_number', 'asset_tag', 'imei', 'mac_address', 'custom']
+
+      identification_primary:
+        type: STRING
+        nullable: false
+        unique: true
+        validation:
+          - conditional_pattern:
+              when: identification_primary_type = 'vin'
+              pattern: '^[A-HJ-NPR-Z0-9]{17}$'
+
+      equipment_category:
+        type: STRING
+        nullable: false
+        enum: ['automotive', 'heavy_equipment', 'electronics', 'machinery', 'appliances', 'marine', 'agricultural']
+
+      'equipment_details.manufacturer':
+        type: STRING
+        nullable: true
+        max_length: 100
+
+      'equipment_details.model_year':
+        type: INT64
+        nullable: true
+        min_value: 1900
+        max_value: 2030  # Allow future model years
+
+      'physical.weight_lbs':
+        type: NUMERIC
+        nullable: true
+        min_value: 0
+        max_value: 1000000  # 500 tons max
+
+      'economics.original_msrp':
+        type: NUMERIC
+        nullable: true
+        min_value: 0
+
+      'economics.currency_code':
+        type: STRING
+        nullable: true
+        pattern: '^[A-Z]{3}$'
+
+      'power.voltage_primary':
+        type: INT64
+        nullable: true
+        min_value: 1
+        max_value: 100000  # Industrial equipment can have high voltage
+
+      'ownership.owner_id':
+        type: STRING
+        nullable: true
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+        foreign_key: users.id
+
+      'ownership.operator_id':
+        type: STRING
+        nullable: true
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+        foreign_key: users.id
+
+      'ownership.gps_coordinates':
+        type: GEOGRAPHY
+        nullable: true
+        validation:
+          - valid_geography: true
+
+    business_rules:
+      - rule: "VIN format required for automotive equipment"
+        sql: "equipment_category != 'automotive' OR REGEXP_CONTAINS(identification_primary, r'^[A-HJ-NPR-Z0-9]{17}$')"
+      - rule: "Model year consistency with manufacture date"
+        sql: "equipment_details.model_year IS NULL OR equipment_details.manufacture_date IS NULL OR equipment_details.model_year = EXTRACT(YEAR FROM equipment_details.manufacture_date)"
+      - rule: "Currency code required when prices specified"
+        sql: "economics.original_msrp IS NULL OR economics.currency_code IS NOT NULL"
+
+    upsert_key: identification_primary
+    idempotency_window_hours: 168  # 1 week
+
+  # =====================================
+  # 3. SENSOR TELEMETRY
+  # =====================================
+  sensor_telemetry:
+    description: "IoT sensor readings and telemetry data"
+
+    primary_key:
+      - reading_date
+      - equipment_id
+      - sensor_id
+      - reading_timestamp
+
+    fields:
+      reading_date:
+        type: DATE
+        nullable: false
+        partition_key: true
+
+      equipment_id:
+        type: STRING
+        nullable: false
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+        foreign_key: equipment_registry.id
+
+      sensor_id:
+        type: STRING
+        nullable: false
+        max_length: 100
+
+      reading_timestamp:
+        type: TIMESTAMP
+        nullable: false
+        validation:
+          - not_future: true
+          - matches_partition: reading_date
+
+      reading_value:
+        type: NUMERIC
+        nullable: false
+        validation:
+          - finite_number: true
+
+      'quality.confidence_score':
+        type: NUMERIC
+        nullable: true
+        min_value: 0.0
+        max_value: 1.0
+
+      'quality.anomaly_score':
+        type: NUMERIC
+        nullable: true
+        min_value: 0.0
+        max_value: 1.0
+
+    business_rules:
+      - rule: "Reading timestamp must match partition date"
+        sql: "DATE(reading_timestamp) = reading_date"
+      - rule: "Quality scores are normalized"
+        sql: "quality.confidence_score IS NULL OR (quality.confidence_score >= 0 AND quality.confidence_score <= 1)"
+
+    # Time-series specific rules
+    time_series:
+      order_by: reading_timestamp
+      gap_detection:
+        max_gap_minutes: 60
+      duplicate_detection:
+        key: [equipment_id, sensor_id, reading_timestamp]
+
+    # Retention and lifecycle
+    retention:
+      policy: "730 days"
+      partition_expiration: true
+
+    upsert_key: [equipment_id, sensor_id, reading_timestamp]
+    idempotency_window_hours: 1
+
+  # =====================================
+  # 4. MODELS
+  # =====================================
+  models:
+    description: "ML model registry and metadata"
+
+    primary_key:
+      - model_id
+    unique_constraints:
+      - [model_name, 'version_info.version_number']
+
+    fields:
+      model_id:
+        type: STRING
+        nullable: false
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+
+      model_name:
+        type: STRING
+        nullable: false
+        pattern: '^[a-z][a-z0-9_-]*$'  # Snake case naming
+        max_length: 100
+
+      'version_info.version_number':
+        type: STRING
+        nullable: true
+        pattern: '^v?\d+\.\d+\.\d+(-[a-z0-9]+)?$'  # Semantic versioning
+
+      'version_info.git_commit_hash':
+        type: STRING
+        nullable: true
+        pattern: '^[a-f0-9]{40}$'  # Full SHA-1 hash
+
+      'version_info.is_production':
+        type: BOOL
+        nullable: true
+        default: false
+
+      'version_info.is_champion':
+        type: BOOL
+        nullable: true
+        default: false
+
+      algorithm:
+        type: STRING
+        nullable: true
+        enum: ['linear_regression', 'logistic_regression', 'random_forest', 'gradient_boosting', 'neural_network', 'svm', 'kmeans', 'xgboost', 'lightgbm', 'catboost']
+
+      framework:
+        type: STRING
+        nullable: true
+        enum: ['scikit-learn', 'tensorflow', 'pytorch', 'xgboost', 'lightgbm', 'catboost', 'spark_ml', 'h2o']
+
+      'training.training_rows':
+        type: INT64
+        nullable: true
+        min_value: 1
+
+      'training.training_duration_seconds':
+        type: INT64
+        nullable: true
+        min_value: 1
+
+      'deployment.max_instances':
+        type: INT64
+        nullable: true
+        min_value: 1
+        max_value: 1000
+
+      'deployment.min_instances':
+        type: INT64
+        nullable: true
+        min_value: 0
+        max_value: 100
+
+    business_rules:
+      - rule: "Champion models must be in production"
+        sql: "version_info.is_champion IS FALSE OR version_info.is_production IS TRUE"
+      - rule: "Training end must be after training start"
+        sql: "training.training_start IS NULL OR training.training_end IS NULL OR training.training_end >= training.training_start"
+      - rule: "Min instances cannot exceed max instances"
+        sql: "deployment.min_instances IS NULL OR deployment.max_instances IS NULL OR deployment.min_instances <= deployment.max_instances"
+
+    upsert_key: [model_name, 'version_info.version_number']
+    idempotency_window_hours: 24
+
+  # =====================================
+  # 5. FEATURE STORE
+  # =====================================
+  feature_store:
+    description: "ML feature storage and versioning"
+
+    primary_key:
+      - feature_date
+      - entity_id
+      - entity_type
+      - feature_set_name
+      - feature_set_version
+
+    fields:
+      feature_date:
+        type: DATE
+        nullable: false
+        partition_key: true
+
+      entity_id:
+        type: STRING
+        nullable: false
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+
+      entity_type:
+        type: STRING
+        nullable: false
+        enum: ['equipment', 'user', 'session', 'part']
+
+      feature_set_name:
+        type: STRING
+        nullable: false
+        pattern: '^[a-z][a-z0-9_]*$'
+
+      feature_set_version:
+        type: STRING
+        nullable: false
+        pattern: '^v?\d+\.\d+\.\d+$'
+
+      'data_quality.completeness_score':
+        type: NUMERIC
+        nullable: true
+        min_value: 0.0
+        max_value: 1.0
+
+      'data_quality.freshness_hours':
+        type: INT64
+        nullable: true
+        min_value: 0
+        max_value: 8760  # 1 year in hours
+
+    business_rules:
+      - rule: "Entity ID must reference valid entity based on type"
+        description: "When entity_type is 'equipment', entity_id should reference equipment_registry.id"
+
+    # Time-series and retention
+    retention:
+      policy: "90 days"
+      partition_expiration: true
+
+    upsert_key: [entity_id, entity_type, feature_set_name, feature_set_version, feature_date]
+    idempotency_window_hours: 24
+
+  # =====================================
+  # 6. DIAGNOSTIC SESSIONS
+  # =====================================
+  diagnostic_sessions:
+    description: "Equipment diagnostic session tracking"
+
+    primary_key:
+      - session_id
+
+    fields:
+      session_id:
+        type: STRING
+        nullable: false
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+
+      session_date:
+        type: DATE
+        nullable: false
+        partition_key: true
+
+      equipment_id:
+        type: STRING
+        nullable: false
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+        foreign_key: equipment_registry.id
+
+      technician_id:
+        type: STRING
+        nullable: true
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+        foreign_key: users.id
+
+      customer_id:
+        type: STRING
+        nullable: true
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+        foreign_key: users.id
+
+      session_type:
+        type: STRING
+        nullable: true
+        enum: ['routine_maintenance', 'diagnostic', 'repair', 'inspection', 'warranty']
+
+      'resolution.total_cost':
+        type: NUMERIC
+        nullable: true
+        min_value: 0
+
+      'resolution.labor_hours':
+        type: NUMERIC
+        nullable: true
+        min_value: 0
+        max_value: 100  # Reasonable upper limit
+
+      duration_minutes:
+        type: INT64
+        nullable: true
+        min_value: 1
+        max_value: 10080  # 1 week max
+
+    business_rules:
+      - rule: "Session date must match partition date"
+        sql: "DATE(started_at) = session_date"
+      - rule: "Completed sessions must have completion timestamp"
+        sql: "session_status != 'completed' OR completed_at IS NOT NULL"
+      - rule: "Duration calculated from timestamps"
+        sql: "started_at IS NULL OR completed_at IS NULL OR duration_minutes = TIMESTAMP_DIFF(completed_at, started_at, MINUTE)"
+
+    upsert_key: session_id
+    idempotency_window_hours: 168  # 1 week
+
+  # =====================================
+  # 7. PARTS INVENTORY
+  # =====================================
+  parts_inventory:
+    description: "Parts catalog and inventory management"
+
+    primary_key:
+      - part_id
+    unique_constraints:
+      - part_number
+
+    fields:
+      part_id:
+        type: STRING
+        nullable: false
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+
+      part_number:
+        type: STRING
+        nullable: false
+        unique: true
+        pattern: '^[A-Z0-9-]+$'  # Alphanumeric with dashes
+        max_length: 50
+
+      'pricing.list_price':
+        type: NUMERIC
+        nullable: true
+        min_value: 0
+
+      'pricing.currency':
+        type: STRING
+        nullable: true
+        pattern: '^[A-Z]{3}$'
+
+      'specifications.weight_lbs':
+        type: NUMERIC
+        nullable: true
+        min_value: 0
+        max_value: 10000  # 5 tons max for a part
+
+      'specifications.warranty_months':
+        type: INT64
+        nullable: true
+        min_value: 0
+        max_value: 360  # 30 years max warranty
+
+    business_rules:
+      - rule: "Currency required when price specified"
+        sql: "pricing.list_price IS NULL OR pricing.currency IS NOT NULL"
+
+    upsert_key: part_number
+    idempotency_window_hours: 24
+
+  # =====================================
+  # 8. MAINTENANCE PREDICTIONS
+  # =====================================
+  maintenance_predictions:
+    description: "Predictive maintenance recommendations"
+
+    primary_key:
+      - prediction_id
+
+    fields:
+      prediction_id:
+        type: STRING
+        nullable: false
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+
+      prediction_date:
+        type: DATE
+        nullable: false
+        partition_key: true
+
+      equipment_id:
+        type: STRING
+        nullable: false
+        pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+        foreign_key: equipment_registry.id
+
+      'risk_assessment.overall_risk_score':
+        type: NUMERIC
+        nullable: true
+        min_value: 0.0
+        max_value: 1.0
+
+      'risk_assessment.financial_impact':
+        type: NUMERIC
+        nullable: true
+        min_value: 0
+
+      'risk_assessment.downtime_impact_hours':
+        type: NUMERIC
+        nullable: true
+        min_value: 0
+        max_value: 8760  # 1 year max
+
+    business_rules:
+      - rule: "Risk scores are normalized"
+        sql: "risk_assessment.overall_risk_score IS NULL OR (risk_assessment.overall_risk_score >= 0 AND risk_assessment.overall_risk_score <= 1)"
+
+    upsert_key: [equipment_id, prediction_date]
+    idempotency_window_hours: 24
+
+# ================================
+# DATA TABLES - ACTUAL DATA
+# ================================
+
+data_tables:
+  # =====================================
+  # 1. DTC CODES GITHUB
+  # =====================================
+  dtc_codes_github:
+    description: "Diagnostic trouble codes from GitHub repositories"
+
+    fields:
+      dtc_code:
+        type: STRING
+        nullable: false
+        pattern: '^[PBCU]\d{4}$'
+        description: "Must follow standard DTC format"
+
+      description:
+        type: STRING
+        nullable: false
+        min_length: 10
+        max_length: 500
+
+      category:
+        type: STRING
+        nullable: false
+        enum: ['P', 'B', 'C', 'U']
+        description: "P=Powertrain, B=Body, C=Chassis, U=Network"
+
+      source:
+        type: STRING
+        nullable: false
+        pattern: '^github_[a-z0-9_]+$'
+
+      extraction_date:
+        type: TIMESTAMP
+        nullable: false
+        validation:
+          - not_future: true
+
+      import_timestamp:
+        type: TIMESTAMP
+        nullable: false
+        validation:
+          - not_future: true
+          - not_before_field: extraction_date
+
+    business_rules:
+      - rule: "DTC category must match first character of code"
+        sql: "SUBSTR(dtc_code, 1, 1) = category"
+      - rule: "Import timestamp must be after extraction"
+        sql: "import_timestamp >= extraction_date"
+
+    upsert_key: [dtc_code, source]
+    idempotency_window_hours: 24
+
+    freshness:
+      expected_delay_hours: 6
+      max_delay_hours: 48
+
+  # =====================================
+  # 2. REDDIT DIAGNOSTIC POSTS
+  # =====================================
+  reddit_diagnostic_posts:
+    description: "Reddit posts with automotive diagnostic information"
+
+    fields:
+      url:
+        type: STRING
+        nullable: false
+        unique: true
+        pattern: '^https?://(?:www\.)?reddit\.com/r/.+'
+
+      'equipment.vin':
+        type: STRING
+        nullable: true
+        pattern: '^[A-HJ-NPR-Z0-9]{17}$'
+
+      'diagnostic_codes[].code':
+        type: STRING
+        nullable: true
+        pattern: '^[PBCU]\d{4}$'
+
+      cost:
+        type: FLOAT
+        nullable: true
+        min_value: 0
+        max_value: 100000  # $100k max reasonable repair cost
+
+      timestamp:
+        type: TIMESTAMP
+        nullable: false
+        validation:
+          - not_future: true
+          - not_before: '2005-06-23'  # Reddit founding date
+
+      source_type:
+        type: STRING
+        nullable: false
+        enum: ['post', 'comment']
+
+      source:
+        type: STRING
+        nullable: false
+        pattern: '^reddit_[a-z0-9_]+$'
+
+      import_timestamp:
+        type: TIMESTAMP
+        nullable: false
+        validation:
+          - not_future: true
+          - not_before_field: timestamp
+
+    business_rules:
+      - rule: "VIN format validation for automotive posts"
+        sql: "equipment.vin IS NULL OR REGEXP_CONTAINS(equipment.vin, r'^[A-HJ-NPR-Z0-9]{17}$')"
+      - rule: "Import must be after original post timestamp"
+        sql: "import_timestamp >= timestamp"
+
+    upsert_key: url
+    idempotency_window_hours: 24
+
+    freshness:
+      expected_delay_hours: 12
+      max_delay_hours: 72
+
+  # =====================================
+  # 3. YOUTUBE REPAIR VIDEOS
+  # =====================================
+  youtube_repair_videos:
+    description: "YouTube videos with repair and diagnostic content"
+
+    fields:
+      video_id:
+        type: STRING
+        nullable: true
+        pattern: '^[a-zA-Z0-9_-]{11}$'
+        unique: true
+
+      title:
+        type: STRING
+        nullable: true
+        min_length: 5
+        max_length: 200  # YouTube title length limit
+
+      channel:
+        type: STRING
+        nullable: true
+        min_length: 1
+        max_length: 100
+
+      description:
+        type: STRING
+        nullable: true
+        max_length: 5000  # YouTube description limit
+
+      source:
+        type: STRING
+        nullable: false
+        pattern: '^youtube_[a-z0-9_]+$'
+
+      import_timestamp:
+        type: TIMESTAMP
+        nullable: false
+        validation:
+          - not_future: true
+
+    business_rules:
+      - rule: "Video ID required when title provided"
+        sql: "title IS NULL OR video_id IS NOT NULL"
+
+    upsert_key: video_id
+    idempotency_window_hours: 24
+
+    freshness:
+      expected_delay_hours: 6
+      max_delay_hours: 48
+
+  # =====================================
+  # 4. EQUIPMENT REGISTRY (DATA)
+  # =====================================
+  equipment_registry_data:
+    description: "Actual equipment registry data quality rules"
+    inherits_from: equipment_registry
+
+    # Additional data-specific validations
+    data_quality:
+      completeness_thresholds:
+        identification_primary: 100%  # Must have primary ID
+        equipment_category: 100%     # Must be categorized
+        'equipment_details.manufacturer': 80%  # 80% should have manufacturer
+        'ownership.owner_id': 70%    # 70% should have owner
+
+      value_distributions:
+        equipment_category:
+          automotive: 60-80%         # Expected automotive dominance
+          electronics: 10-20%
+          machinery: 5-15%
+
+      freshness_sla:
+        new_equipment: 24h          # New equipment within 24h
+        updates: 72h                # Updates within 3 days
+
+# ================================
+# BATCH AND PIPELINE RULES
+# ================================
+
+pipeline_validation:
+  # File-level validation
+  file_requirements:
+    format: "NEWLINE_DELIMITED_JSON"
+    compression: ["gzip", "brotli"]
+    encoding: "UTF-8"
+    max_file_size_mb: 100
+    min_batch_size: 1
+    max_batch_size: 10000
+
+  # Naming conventions
+  file_naming:
+    pattern: '^[a-z0-9_]+_\d{8}_\d{6}\.(json|ndjson)\.gz$'
+    example: "dtc_codes_20250916_143022.ndjson.gz"
+
+  # Data validation pipeline
+  validation_stages:
+    1_schema_validation:
+      description: "Validate against BigQuery schema"
+      fail_fast: true
+
+    2_business_rules:
+      description: "Apply business logic validation"
+      error_threshold: 5%  # Fail if >5% of records have business rule violations
+
+    3_referential_integrity:
+      description: "Check foreign key relationships"
+      warning_threshold: 1%  # Warn if >1% have FK violations
+
+    4_duplicate_detection:
+      description: "Identify duplicate records"
+      action: "merge_with_latest"
+
+    5_data_quality_scoring:
+      description: "Calculate completeness and accuracy scores"
+      minimum_score: 0.8
+
+  # Performance and optimization
+  performance_rules:
+    partition_requirements:
+      sensor_telemetry: "reading_date (required)"
+      feature_store: "feature_date (required)"
+      diagnostic_sessions: "session_date (required)"
+      maintenance_predictions: "prediction_date (required)"
+
+    clustering_optimization:
+      all_tables: "Apply clustering on frequently filtered columns"
+
+    query_optimization:
+      require_partition_filter:
+        - sensor_telemetry
+        - feature_store
+
+  # Monitoring and alerting
+  monitoring:
+    data_freshness:
+      check_frequency: "hourly"
+      alert_threshold: "24 hours"
+
+    schema_drift:
+      check_frequency: "daily"
+      alert_on_new_fields: true
+      alert_on_type_changes: true
+
+    data_quality_degradation:
+      check_frequency: "hourly"
+      score_threshold: 0.7
+
+    referential_integrity:
+      check_frequency: "daily"
+      orphan_threshold: 1%
+
+# ================================
+# ERROR HANDLING AND RECOVERY
+# ================================
+
+error_handling:
+  validation_failures:
+    critical_failures:
+      - schema_mismatch
+      - invalid_primary_key
+      - corrupt_data
+      action: "reject_batch"
+
+    warning_failures:
+      - missing_optional_fields
+      - foreign_key_violations
+      - business_rule_violations
+      action: "log_and_continue"
+
+  retry_policies:
+    transient_errors:
+      max_retries: 3
+      backoff_strategy: "exponential"
+      base_delay_seconds: 60
+
+    permanent_errors:
+      max_retries: 0
+      action: "dead_letter_queue"
+
+  data_quarantine:
+    quarantine_conditions:
+      - validation_failure_rate > 10%
+      - duplicate_rate > 50%
+      - schema_compliance < 90%
+
+    quarantine_duration: "7 days"
+    review_required: true
+
+# ================================
+# COMPLIANCE AND AUDITING
+# ================================
+
+compliance:
+  data_lineage:
+    track_source: true
+    track_transformations: true
+    retention_period: "7 years"
+
+  audit_logging:
+    log_all_changes: true
+    include_field_level_changes: true
+    retention_period: "7 years"
+
+  data_privacy:
+    pii_fields:
+      - users.email
+      - 'users.profile.*'
+      - equipment_registry.identification_primary
+
+    anonymization_rules:
+      email: "hash_with_salt"
+      phone: "mask_middle_digits"
+
+  regulatory_compliance:
+    gdpr:
+      right_to_be_forgotten: true
+      data_minimization: true
+
+    industry_standards:
+      - ISO_27001
+      - SOC_2_Type_II
+
+# ================================
+# PERFORMANCE BENCHMARKS
+# ================================
+
+performance_targets:
+  ingestion:
+    throughput: "10,000 records/second"
+    latency_p95: "< 500ms"
+
+  validation:
+    throughput: "50,000 records/second"
+    latency_p95: "< 100ms"
+
+  query_performance:
+    simple_queries: "< 1 second"
+    complex_analytics: "< 30 seconds"
+
+  data_freshness:
+    real_time_data: "< 1 hour"
+    batch_data: "< 24 hours"
+
+  availability:
+    uptime_target: "99.9%"
+    recovery_time_objective: "< 4 hours"
+    recovery_point_objective: "< 1 hour"

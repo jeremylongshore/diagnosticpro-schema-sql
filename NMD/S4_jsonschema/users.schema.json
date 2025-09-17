@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://diagnosticpro.com/schemas/users.json",
+  "title": "Users",
+  "description": "User authentication and profile management schema",
+  "type": "object",
+  "required": [
+    "id",
+    "email",
+    "password_hash",
+    "user_type",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "UUID v4 primary identifier"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "maxLength": 254,
+      "description": "User email address (unique)"
+    },
+    "email_verified": {
+      "type": ["boolean", "null"],
+      "default": false,
+      "description": "Whether email has been verified"
+    },
+    "email_verified_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Timestamp when email was verified"
+    },
+    "password_hash": {
+      "type": "string",
+      "minLength": 60,
+      "maxLength": 255,
+      "description": "bcrypt password hash"
+    },
+    "user_type": {
+      "type": "string",
+      "enum": ["customer", "technician", "administrator", "shop_owner", "fleet_manager"],
+      "description": "Type of user account"
+    },
+    "profile": {
+      "type": "object",
+      "properties": {
+        "first_name": {
+          "type": ["string", "null"],
+          "maxLength": 100,
+          "description": "User's first name"
+        },
+        "last_name": {
+          "type": ["string", "null"],
+          "maxLength": 100,
+          "description": "User's last name"
+        },
+        "phone": {
+          "type": ["string", "null"],
+          "pattern": "^\\+?[\\d\\s\\-\\(\\)]{10,20}$",
+          "description": "Phone number with international format support"
+        },
+        "timezone": {
+          "type": ["string", "null"],
+          "pattern": "^[A-Za-z]+/[A-Za-z_]+$",
+          "description": "IANA timezone identifier (e.g., America/New_York)"
+        },
+        "country": {
+          "type": ["string", "null"],
+          "pattern": "^[A-Z]{2}$",
+          "description": "ISO 3166-1 alpha-2 country code"
+        },
+        "avatar_url": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "description": "URL to user's avatar image"
+        },
+        "bio": {
+          "type": ["string", "null"],
+          "maxLength": 500,
+          "description": "User biography or description"
+        }
+      },
+      "additionalProperties": false
+    },
+    "auth": {
+      "type": "object",
+      "properties": {
+        "mfa_enabled": {
+          "type": ["boolean", "null"],
+          "default": false,
+          "description": "Whether multi-factor authentication is enabled"
+        },
+        "failed_login_attempts": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 10,
+          "default": 0,
+          "description": "Number of consecutive failed login attempts"
+        },
+        "locked_until": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Timestamp until which account is locked"
+        },
+        "last_password_change": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Timestamp of last password change"
+        },
+        "password_reset_token": {
+          "type": ["string", "null"],
+          "description": "Password reset token (if pending)"
+        },
+        "password_reset_expires": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Password reset token expiration"
+        }
+      },
+      "additionalProperties": false
+    },
+    "preferences": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": ["string", "null"],
+          "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+          "description": "Language preference (ISO 639-1 with optional region)"
+        },
+        "notifications_email": {
+          "type": ["boolean", "null"],
+          "default": true,
+          "description": "Whether to receive email notifications"
+        },
+        "notifications_sms": {
+          "type": ["boolean", "null"],
+          "default": false,
+          "description": "Whether to receive SMS notifications"
+        },
+        "theme": {
+          "type": ["string", "null"],
+          "enum": ["light", "dark", "auto"],
+          "description": "UI theme preference"
+        }
+      },
+      "additionalProperties": false
+    },
+    "last_login_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Timestamp of last successful login"
+    },
+    "is_active": {
+      "type": ["boolean", "null"],
+      "default": true,
+      "description": "Whether user account is active"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when record was created"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when record was last updated"
+    },
+    "deleted_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Timestamp when record was soft deleted (null if active)"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "email_verified": {"const": true}
+        }
+      },
+      "then": {
+        "required": ["email_verified_at"],
+        "properties": {
+          "email_verified_at": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "auth": {
+            "properties": {
+              "failed_login_attempts": {
+                "minimum": 5
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "auth": {
+            "required": ["locked_until"],
+            "properties": {
+              "locked_until": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "deleted_at": {"type": "string"}
+        }
+      },
+      "then": {
+        "properties": {
+          "is_active": {"const": false}
+        }
+      }
+    }
+  ]
+}

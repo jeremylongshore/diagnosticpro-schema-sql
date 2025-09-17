@@ -1,0 +1,383 @@
+{
+  "validation_test_cases": {
+    "description": "Edge cases and boundary conditions for S5 event contract validation",
+    "version": "1.0",
+    "created_date": "2025-09-17",
+
+    "dtc_codes_github": {
+      "valid_records": [
+        {
+          "description": "Minimum valid record with required fields only",
+          "record": {
+            "dtc_code": "P0001",
+            "description": "Fuel Volume Regulator Control Circuit/Open",
+            "category": "P",
+            "source": "github_minimal_test",
+            "extraction_date": "2025-09-17T10:00:00Z",
+            "import_timestamp": "2025-09-17T10:05:00Z"
+          }
+        },
+        {
+          "description": "Maximum length description (500 characters)",
+          "record": {
+            "dtc_code": "B9999",
+            "description": "This is a test description that reaches exactly 500 characters to validate the maximum length constraint for the description field in DTC codes from GitHub repositories. This description contains multiple technical terms and explanations about diagnostic trouble codes, their symptoms, causes, and potential solutions. It includes information about engine management systems, electronic control units, sensor readings, actuator operations, and various automotive subsystems that could be affected by this particular diagnostic trouble code when it appears during vehicle diagnostics.",
+            "category": "B",
+            "source": "github_max_length_test",
+            "extraction_date": "2025-09-17T10:00:00Z",
+            "import_timestamp": "2025-09-17T10:05:00Z"
+          }
+        }
+      ],
+
+      "boundary_conditions": [
+        {
+          "description": "DTC code with minimum format P0000",
+          "record": {
+            "dtc_code": "P0000",
+            "description": "No fault found",
+            "category": "P",
+            "source": "github_boundary_test",
+            "extraction_date": "2025-09-17T10:00:00Z",
+            "import_timestamp": "2025-09-17T10:05:00Z"
+          }
+        },
+        {
+          "description": "Maximum array items - 20 common causes",
+          "record": {
+            "dtc_code": "U1234",
+            "description": "Communication error with multiple potential causes",
+            "category": "U",
+            "common_causes": [
+              "Cause 1", "Cause 2", "Cause 3", "Cause 4", "Cause 5",
+              "Cause 6", "Cause 7", "Cause 8", "Cause 9", "Cause 10",
+              "Cause 11", "Cause 12", "Cause 13", "Cause 14", "Cause 15",
+              "Cause 16", "Cause 17", "Cause 18", "Cause 19", "Cause 20"
+            ],
+            "source": "github_array_max_test",
+            "extraction_date": "2025-09-17T10:00:00Z",
+            "import_timestamp": "2025-09-17T10:05:00Z"
+          }
+        }
+      ],
+
+      "international_characters": [
+        {
+          "description": "DTC with Unicode characters in description",
+          "record": {
+            "dtc_code": "P0171",
+            "description": "Système trop pauvre (Bank 1) - Mixture too lean. Мixture слишком бедная. システムが薄すぎます",
+            "category": "P",
+            "source": "github_unicode_test",
+            "extraction_date": "2025-09-17T10:00:00Z",
+            "import_timestamp": "2025-09-17T10:05:00Z"
+          }
+        }
+      ],
+
+      "edge_cases": [
+        {
+          "description": "Missing optional fields",
+          "record": {
+            "dtc_code": "C0561",
+            "description": "System disabled information stored",
+            "category": "C",
+            "source": "github_minimal_optional",
+            "extraction_date": "2025-09-17T10:00:00Z",
+            "import_timestamp": "2025-09-17T10:05:00Z"
+          }
+        },
+        {
+          "description": "Empty arrays for optional fields",
+          "record": {
+            "dtc_code": "B1001",
+            "description": "Driver airbag squib circuit short to ground",
+            "category": "B",
+            "common_causes": [],
+            "symptoms": [],
+            "related_codes": [],
+            "source": "github_empty_arrays",
+            "extraction_date": "2025-09-17T10:00:00Z",
+            "import_timestamp": "2025-09-17T10:05:00Z"
+          }
+        }
+      ]
+    },
+
+    "reddit_diagnostic_posts": {
+      "valid_records": [
+        {
+          "description": "Comment with minimum required fields",
+          "record": {
+            "url": "https://www.reddit.com/r/MechanicAdvice/comments/test123/comment/comment456",
+            "comment_id": "comment456",
+            "timestamp": "2025-09-17T08:00:00Z",
+            "source_type": "comment",
+            "source": "reddit_minimal_test",
+            "import_timestamp": "2025-09-17T08:05:00Z"
+          }
+        },
+        {
+          "description": "Post with maximum content length (40,000 characters)",
+          "record": {
+            "url": "https://www.reddit.com/r/MechanicAdvice/comments/maxtest/max_content_test/",
+            "post_id": "maxtest",
+            "title": "Maximum content length test post",
+            "content": "This is a test post with maximum content length. " + "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(740),
+            "timestamp": "2025-09-17T08:00:00Z",
+            "source_type": "post",
+            "source": "reddit_max_content",
+            "import_timestamp": "2025-09-17T08:05:00Z"
+          }
+        }
+      ],
+
+      "boundary_conditions": [
+        {
+          "description": "Reddit founding date boundary (2005-06-23)",
+          "record": {
+            "url": "https://www.reddit.com/r/reddit.com/comments/historical/early_post/",
+            "post_id": "historical",
+            "timestamp": "2005-06-23T00:00:01Z",
+            "source_type": "post",
+            "source": "reddit_historical",
+            "import_timestamp": "2025-09-17T08:05:00Z"
+          }
+        },
+        {
+          "description": "Maximum mileage (1,000,000 miles)",
+          "record": {
+            "url": "https://www.reddit.com/r/HighMileage/comments/million/one_million_miles/",
+            "post_id": "million",
+            "equipment": {
+              "make": "Toyota",
+              "model": "Corolla",
+              "year": 1995,
+              "mileage": 1000000
+            },
+            "timestamp": "2025-09-17T08:00:00Z",
+            "source_type": "post",
+            "source": "reddit_high_mileage",
+            "import_timestamp": "2025-09-17T08:05:00Z"
+          }
+        }
+      ],
+
+      "international_characters": [
+        {
+          "description": "Non-English content with special characters",
+          "record": {
+            "url": "https://www.reddit.com/r/MechanicAdvice/comments/intl123/international_help/",
+            "post_id": "intl123",
+            "title": "Помощь с автомобилем - Need help with車の問題",
+            "content": "Mein Auto hat Problème mit dem Motor. El coche tiene problemas. Автомобиль не работает правильно. 車が動かない。",
+            "author": "international_user_2024",
+            "timestamp": "2025-09-17T08:00:00Z",
+            "source_type": "post",
+            "source": "reddit_international",
+            "import_timestamp": "2025-09-17T08:05:00Z"
+          }
+        }
+      ]
+    },
+
+    "youtube_repair_videos": {
+      "valid_records": [
+        {
+          "description": "Minimum required fields only",
+          "record": {
+            "source": "youtube_minimal_test",
+            "import_timestamp": "2025-09-17T11:00:00Z"
+          }
+        },
+        {
+          "description": "Maximum duration (12 hours = 43,200 seconds)",
+          "record": {
+            "video_id": "maxlength12h",
+            "title": "12 Hour Complete Engine Rebuild Documentary",
+            "duration_seconds": 43200,
+            "source": "youtube_max_duration",
+            "import_timestamp": "2025-09-17T11:00:00Z"
+          }
+        }
+      ],
+
+      "boundary_conditions": [
+        {
+          "description": "Maximum tags (500 items)",
+          "record": {
+            "video_id": "maxtagstest",
+            "title": "Video with maximum tags",
+            "tags": Array.from({length: 500}, (_, i) => `tag${i + 1}`),
+            "source": "youtube_max_tags",
+            "import_timestamp": "2025-09-17T11:00:00Z"
+          }
+        },
+        {
+          "description": "Maximum transcript length (100,000 characters)",
+          "record": {
+            "video_id": "maxtranscpt",
+            "title": "Long diagnostic video with full transcript",
+            "transcript": {
+              "has_transcript": true,
+              "transcript_text": "This is a very long transcript. ".repeat(3125), // Approx 100k chars
+              "auto_generated": false,
+              "language": "en-US"
+            },
+            "source": "youtube_max_transcript",
+            "import_timestamp": "2025-09-17T11:00:00Z"
+          }
+        }
+      ],
+
+      "international_characters": [
+        {
+          "description": "Multi-language video content",
+          "record": {
+            "video_id": "multilang01",
+            "title": "Réparation Automobile - Car Repair - Авторемонт - 自動車修理",
+            "description": "Tutorial en français, English, русский, 日本語",
+            "language": "fr-FR",
+            "source": "youtube_multilingual",
+            "import_timestamp": "2025-09-17T11:00:00Z"
+          }
+        }
+      ]
+    },
+
+    "equipment_registry": {
+      "valid_records": [
+        {
+          "description": "Minimum required fields only",
+          "record": {
+            "id": "550e8400-e29b-41d4-a716-446655440001",
+            "identification_primary_type": "custom",
+            "identification_primary": "X",
+            "equipment_category": "electronics",
+            "created_at": "2025-09-17T12:00:00Z",
+            "updated_at": "2025-09-17T12:00:00Z"
+          }
+        },
+        {
+          "description": "Maximum weight (1,000,000 lbs)",
+          "record": {
+            "id": "550e8400-e29b-41d4-a716-446655440002",
+            "identification_primary_type": "asset_tag",
+            "identification_primary": "HEAVY-EQUIPMENT-001",
+            "equipment_category": "heavy_equipment",
+            "physical": {
+              "weight_lbs": 1000000
+            },
+            "created_at": "2025-09-17T12:00:00Z",
+            "updated_at": "2025-09-17T12:00:00Z"
+          }
+        }
+      ],
+
+      "boundary_conditions": [
+        {
+          "description": "GPS coordinates at extreme boundaries",
+          "record": {
+            "id": "550e8400-e29b-41d4-a716-446655440003",
+            "identification_primary_type": "serial_number",
+            "identification_primary": "EXTREME-GPS-001",
+            "equipment_category": "machinery",
+            "ownership": {
+              "gps_coordinates": {
+                "latitude": -90.0,
+                "longitude": -180.0
+              }
+            },
+            "created_at": "2025-09-17T12:00:00Z",
+            "updated_at": "2025-09-17T12:00:00Z"
+          }
+        },
+        {
+          "description": "Maximum voltage (100,000V)",
+          "record": {
+            "id": "550e8400-e29b-41d4-a716-446655440004",
+            "identification_primary_type": "asset_tag",
+            "identification_primary": "HIGH-VOLTAGE-001",
+            "equipment_category": "machinery",
+            "power": {
+              "voltage_primary": 100000,
+              "amperage_max": 1000
+            },
+            "created_at": "2025-09-17T12:00:00Z",
+            "updated_at": "2025-09-17T12:00:00Z"
+          }
+        }
+      ],
+
+      "international_characters": [
+        {
+          "description": "Equipment with international characters",
+          "record": {
+            "id": "550e8400-e29b-41d4-a716-446655440005",
+            "identification_primary_type": "vin",
+            "identification_primary": "WVWZZZ3CZKE123456",
+            "equipment_category": "automotive",
+            "equipment_details": {
+              "manufacturer": "Volkswagen",
+              "model": "Golf GTI",
+              "description": "Véhicule européen avec caractères spéciaux - åäöüß"
+            },
+            "created_at": "2025-09-17T12:00:00Z",
+            "updated_at": "2025-09-17T12:00:00Z"
+          }
+        }
+      ],
+
+      "vin_validation_cases": [
+        {
+          "description": "Valid VIN with all allowed characters",
+          "record": {
+            "id": "550e8400-e29b-41d4-a716-446655440006",
+            "identification_primary_type": "vin",
+            "identification_primary": "ABCDEFGHJKLMNPRTUVWXYZ01234567890",
+            "equipment_category": "automotive",
+            "created_at": "2025-09-17T12:00:00Z",
+            "updated_at": "2025-09-17T12:00:00Z"
+          }
+        }
+      ]
+    },
+
+    "global_validation_tests": {
+      "timestamp_formats": [
+        {
+          "description": "ISO 8601 with timezone",
+          "valid_timestamps": [
+            "2025-09-17T10:30:00Z",
+            "2025-09-17T10:30:00+00:00",
+            "2025-09-17T10:30:00-05:00",
+            "2025-09-17T10:30:00.123Z"
+          ]
+        }
+      ],
+
+      "url_validation": [
+        {
+          "description": "Valid URL formats",
+          "valid_urls": [
+            "https://www.reddit.com/r/MechanicAdvice/comments/abc123/test/",
+            "http://reddit.com/r/test/comments/123/",
+            "https://youtube.com/watch?v=dQw4w9WgXcQ",
+            "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=30s"
+          ]
+        }
+      ],
+
+      "uuid_validation": [
+        {
+          "description": "Valid UUID v4 formats",
+          "valid_uuids": [
+            "550e8400-e29b-41d4-a716-446655440000",
+            "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+            "12345678-1234-4234-a234-123456789012"
+          ]
+        }
+      ]
+    }
+  }
+}

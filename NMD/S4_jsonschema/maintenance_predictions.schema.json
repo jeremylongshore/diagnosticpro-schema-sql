@@ -1,0 +1,402 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://diagnosticpro.com/schemas/maintenance_predictions.json",
+  "title": "Maintenance Predictions",
+  "description": "Predictive maintenance recommendations schema",
+  "type": "object",
+  "required": [
+    "prediction_id",
+    "prediction_date",
+    "equipment_id",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "prediction_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "UUID v4 prediction identifier"
+    },
+    "prediction_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date when prediction was made (used for partitioning)"
+    },
+    "equipment_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "UUID of equipment (references equipment_registry.id)"
+    },
+    "model_id": {
+      "type": ["string", "null"],
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "UUID of ML model used for prediction"
+    },
+    "prediction_type": {
+      "type": ["string", "null"],
+      "enum": [
+        "component_failure",
+        "maintenance_required",
+        "performance_degradation",
+        "safety_concern",
+        "efficiency_optimization",
+        "cost_optimization",
+        "scheduled_maintenance",
+        "emergency_maintenance"
+      ],
+      "description": "Type of maintenance prediction"
+    },
+    "component_type": {
+      "type": ["string", "null"],
+      "enum": [
+        "engine",
+        "transmission",
+        "brakes",
+        "suspension",
+        "electrical_system",
+        "fuel_system",
+        "cooling_system",
+        "exhaust_system",
+        "steering",
+        "hvac",
+        "battery",
+        "alternator",
+        "starter",
+        "sensors",
+        "control_modules",
+        "filters",
+        "belts",
+        "hoses",
+        "fluids"
+      ],
+      "description": "Specific component being predicted"
+    },
+    "risk_assessment": {
+      "type": "object",
+      "properties": {
+        "overall_risk_score": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Overall risk score (0-1, normalized)"
+        },
+        "risk_level": {
+          "type": ["string", "null"],
+          "enum": ["low", "medium", "high", "critical"],
+          "description": "Categorical risk level"
+        },
+        "confidence_score": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Model confidence in prediction (0-1)"
+        },
+        "financial_impact": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Estimated financial impact in dollars"
+        },
+        "downtime_impact_hours": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 8760,
+          "description": "Estimated downtime in hours (max 1 year)"
+        },
+        "safety_impact": {
+          "type": ["string", "null"],
+          "enum": ["none", "minor", "moderate", "major", "critical"],
+          "description": "Safety impact assessment"
+        }
+      },
+      "additionalProperties": false
+    },
+    "timeline": {
+      "type": "object",
+      "properties": {
+        "predicted_failure_date": {
+          "type": ["string", "null"],
+          "format": "date",
+          "description": "Predicted date of failure or maintenance need"
+        },
+        "maintenance_window_start": {
+          "type": ["string", "null"],
+          "format": "date",
+          "description": "Recommended maintenance window start"
+        },
+        "maintenance_window_end": {
+          "type": ["string", "null"],
+          "format": "date",
+          "description": "Recommended maintenance window end"
+        },
+        "days_until_action_needed": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Days until maintenance action needed"
+        },
+        "urgency": {
+          "type": ["string", "null"],
+          "enum": ["immediate", "within_week", "within_month", "within_quarter", "planned"],
+          "description": "Urgency classification"
+        }
+      },
+      "additionalProperties": false
+    },
+    "recommendation": {
+      "type": "object",
+      "properties": {
+        "action_type": {
+          "type": ["string", "null"],
+          "enum": [
+            "inspect",
+            "replace",
+            "repair",
+            "service",
+            "adjust",
+            "clean",
+            "calibrate",
+            "monitor",
+            "schedule_maintenance"
+          ],
+          "description": "Recommended action type"
+        },
+        "description": {
+          "type": ["string", "null"],
+          "maxLength": 1000,
+          "description": "Detailed recommendation description"
+        },
+        "parts_needed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "part_id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+              },
+              "part_number": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "quantity": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "estimated_cost": {
+                "type": ["number", "null"],
+                "minimum": 0
+              }
+            },
+            "required": ["part_id", "quantity"],
+            "additionalProperties": false
+          },
+          "description": "Parts likely needed for maintenance"
+        },
+        "estimated_labor_hours": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Estimated labor hours required"
+        },
+        "total_estimated_cost": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Total estimated cost including parts and labor"
+        },
+        "priority": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Priority ranking (1=highest, 10=lowest)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "data_sources": {
+      "type": "object",
+      "properties": {
+        "sensor_data_used": {
+          "type": ["boolean", "null"],
+          "description": "Whether sensor telemetry was used"
+        },
+        "maintenance_history_used": {
+          "type": ["boolean", "null"],
+          "description": "Whether maintenance history was considered"
+        },
+        "usage_patterns_used": {
+          "type": ["boolean", "null"],
+          "description": "Whether usage patterns were analyzed"
+        },
+        "environmental_factors_used": {
+          "type": ["boolean", "null"],
+          "description": "Whether environmental factors were considered"
+        },
+        "external_data_sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "description": "External data sources used"
+        },
+        "data_quality_score": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Quality score of input data (0-1)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "human_validated": {
+          "type": ["boolean", "null"],
+          "description": "Whether prediction was validated by human expert"
+        },
+        "validation_timestamp": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "When validation was performed"
+        },
+        "validator_id": {
+          "type": ["string", "null"],
+          "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+          "description": "ID of person who validated"
+        },
+        "validation_notes": {
+          "type": ["string", "null"],
+          "maxLength": 500,
+          "description": "Validation notes or comments"
+        },
+        "is_accurate": {
+          "type": ["boolean", "null"],
+          "description": "Whether prediction proved accurate"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": ["string", "null"],
+      "enum": ["pending", "scheduled", "in_progress", "completed", "cancelled", "overdue"],
+      "description": "Current status of prediction/recommendation"
+    },
+    "is_active": {
+      "type": ["boolean", "null"],
+      "default": true,
+      "description": "Whether prediction is still active"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when record was created"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when record was last updated"
+    },
+    "deleted_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Timestamp when record was soft deleted (null if active)"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "description": "Risk scores must be normalized (0-1)",
+      "if": {
+        "properties": {
+          "risk_assessment": {
+            "properties": {
+              "overall_risk_score": {"type": "number"}
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "risk_assessment": {
+            "properties": {
+              "overall_risk_score": {
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "Confidence scores must be normalized (0-1)",
+      "if": {
+        "properties": {
+          "risk_assessment": {
+            "properties": {
+              "confidence_score": {"type": "number"}
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "risk_assessment": {
+            "properties": {
+              "confidence_score": {
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "Maintenance window end must be after start",
+      "if": {
+        "properties": {
+          "timeline": {
+            "properties": {
+              "maintenance_window_start": {"type": "string"},
+              "maintenance_window_end": {"type": "string"}
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "timeline": {
+            "properties": {
+              "maintenance_window_start": {"type": "string"},
+              "maintenance_window_end": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "Validation requires validator when human validated",
+      "if": {
+        "properties": {
+          "validation": {
+            "properties": {
+              "human_validated": {"const": true}
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "validation": {
+            "required": ["validator_id", "validation_timestamp"],
+            "properties": {
+              "validator_id": {"type": "string"},
+              "validation_timestamp": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  ]
+}

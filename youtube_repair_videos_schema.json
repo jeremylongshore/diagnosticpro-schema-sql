@@ -1,0 +1,38 @@
+[
+  {
+    "name": "video_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "YouTube video identifier"
+  },
+  {
+    "name": "title",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Video title"
+  },
+  {
+    "name": "channel",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "YouTube channel name"
+  },
+  {
+    "name": "description",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Video description"
+  },
+  {
+    "name": "source",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Data source identifier"
+  },
+  {
+    "name": "import_timestamp",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "When the data was imported to the pipeline"
+  }
+]

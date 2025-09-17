@@ -1,0 +1,204 @@
+# S1 - BigQuery Schema Keys and Constraints
+# Generated: 2025-09-16
+# Note: BigQuery doesn't enforce FK constraints but logical relationships documented
+
+primary_keys:
+  users:
+    - id  # STRING NOT NULL (UUID)
+  equipment_registry:
+    - id  # STRING NOT NULL (UUID)
+  sensor_telemetry:
+    # Composite key for time-series data
+    - reading_date
+    - equipment_id
+    - sensor_id
+    - reading_timestamp
+  models:
+    - model_id  # STRING NOT NULL
+  feature_store:
+    # Composite key for feature tracking
+    - feature_date
+    - entity_id
+    - entity_type
+    - feature_set_name
+    - feature_set_version
+  diagnostic_sessions:
+    - session_id  # STRING NOT NULL
+  parts_inventory:
+    - part_id  # STRING NOT NULL
+  maintenance_predictions:
+    - prediction_id  # STRING NOT NULL
+
+foreign_keys:
+  # Logical foreign key relationships (not enforced by BigQuery)
+  equipment_registry:
+    - column: ownership.owner_id
+      references: users.id
+      description: Equipment owner reference
+    - column: ownership.primary_operator_id
+      references: users.id
+      description: Primary operator reference
+
+  sensor_telemetry:
+    - column: equipment_id
+      references: equipment_registry.id
+      description: Equipment being monitored
+
+  diagnostic_sessions:
+    - column: equipment_id
+      references: equipment_registry.id
+      description: Equipment being diagnosed
+    - column: technician_id
+      references: users.id
+      description: Technician performing diagnosis
+    - column: customer_id
+      references: users.id
+      description: Customer requesting service
+
+  feature_store:
+    - column: equipment_id
+      references: equipment_registry.id
+      description: Equipment features (when entity_type='equipment')
+
+  maintenance_predictions:
+    - column: equipment_id
+      references: equipment_registry.id
+      description: Equipment needing maintenance
+
+unique_constraints:
+  users:
+    - email  # Unique email per user
+  equipment_registry:
+    - identification_primary  # Unique primary identifier (VIN, serial, etc.)
+  parts_inventory:
+    - part_number  # Unique part number per item
+  models:
+    - [model_name, model_version]  # Unique combination
+
+indexes:
+  # Clustering keys serve as indexes in BigQuery
+  users:
+    clustering:
+      - user_type
+      - email
+    partitioning:
+      column: created_at
+      type: DATE
+
+  equipment_registry:
+    clustering:
+      - equipment_category
+      - equipment_details.manufacturer
+    partitioning:
+      column: created_at
+      type: DATE
+
+  sensor_telemetry:
+    clustering:
+      - equipment_id
+      - sensor_id
+    partitioning:
+      column: reading_date
+      type: DATE
+      retention_days: 730
+      require_filter: true
+
+  models:
+    clustering:
+      - model_name
+      - model_version
+      - framework
+
+  feature_store:
+    clustering:
+      - entity_type
+      - entity_id
+      - feature_set_name
+    partitioning:
+      column: feature_date
+      type: DATE
+      retention_days: 90
+      require_filter: true
+
+  diagnostic_sessions:
+    clustering:
+      - equipment_id
+      - session_status
+    partitioning:
+      column: session_date
+      type: DATE
+      retention_days: 2555
+
+  parts_inventory:
+    clustering:
+      - part_number
+      - supplier_name
+      - location.warehouse_id
+
+  maintenance_predictions:
+    clustering:
+      - equipment_id
+      - risk_level
+    partitioning:
+      column: prediction_date
+      type: DATE
+
+check_constraints:
+  # Business rule validations (application-enforced)
+  diagnostic_sessions:
+    - field: session_status
+      values: ['pending', 'in_progress', 'completed', 'cancelled']
+
+  maintenance_predictions:
+    - field: risk_level
+      values: ['low', 'medium', 'high', 'critical']
+
+  equipment_registry:
+    - field: equipment_category
+      values: ['automotive', 'heavy_equipment', 'electronics', 'machinery', 'appliances', 'marine', 'agricultural']
+
+  users:
+    - field: user_type
+      values: ['customer', 'technician', 'administrator', 'shop_owner', 'fleet_manager']
+
+  sensor_telemetry:
+    - field: reading_quality
+      values: ['good', 'uncertain', 'bad', 'not_available']
+
+data_integrity_rules:
+  dtc_code_format:
+    pattern: '^[PBCU]\d{4}$'
+    description: 'Diagnostic Trouble Code format (P=Powertrain, B=Body, C=Chassis, U=Network)'
+
+  vin_format:
+    pattern: '^[A-HJ-NPR-Z0-9]{17}$'
+    description: 'Vehicle Identification Number (17 characters, no I, O, Q)'
+
+  email_format:
+    pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    description: 'Valid email address format'
+
+  uuid_format:
+    pattern: '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+    description: 'UUID v4 format for primary keys'
+
+performance_optimizations:
+  partition_pruning_required:
+    - sensor_telemetry
+    - feature_store
+
+  automatic_expiration:
+    sensor_telemetry: 730  # days
+    feature_store: 90  # days
+    diagnostic_sessions: 2555  # days
+
+  clustering_strategy:
+    coverage: '100%'  # All 8 defined tables have clustering
+    purpose: 'Optimize query performance and reduce costs'
+
+notes:
+  - BigQuery uses clustering instead of traditional indexes
+  - Foreign keys are logical only - not database-enforced
+  - Partitioning provides cost optimization and performance
+  - CHECK constraints must be enforced at application level
+  - STRUCT and ARRAY fields allow flexible schema evolution

@@ -1,0 +1,390 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://diagnosticpro.com/schemas/reddit_diagnostic_posts.json",
+  "title": "Reddit Diagnostic Posts",
+  "description": "Reddit posts with automotive diagnostic information schema",
+  "type": "object",
+  "required": [
+    "url",
+    "timestamp",
+    "source_type",
+    "source",
+    "import_timestamp"
+  ],
+  "properties": {
+    "url": {
+      "type": "string",
+      "pattern": "^https?://(?:www\\.)?reddit\\.com/r/.+",
+      "description": "Reddit post or comment URL"
+    },
+    "post_id": {
+      "type": ["string", "null"],
+      "maxLength": 20,
+      "description": "Reddit post ID"
+    },
+    "comment_id": {
+      "type": ["string", "null"],
+      "maxLength": 20,
+      "description": "Reddit comment ID (if this is a comment)"
+    },
+    "title": {
+      "type": ["string", "null"],
+      "maxLength": 300,
+      "description": "Post title (for posts only)"
+    },
+    "content": {
+      "type": ["string", "null"],
+      "maxLength": 40000,
+      "description": "Post or comment content text"
+    },
+    "author": {
+      "type": ["string", "null"],
+      "maxLength": 50,
+      "description": "Reddit username (may be deleted or anonymized)"
+    },
+    "subreddit": {
+      "type": ["string", "null"],
+      "maxLength": 50,
+      "description": "Subreddit name where post was found"
+    },
+    "score": {
+      "type": ["integer", "null"],
+      "description": "Reddit score (upvotes - downvotes)"
+    },
+    "num_comments": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Number of comments (for posts only)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Original post/comment timestamp"
+    },
+    "source_type": {
+      "type": "string",
+      "enum": ["post", "comment"],
+      "description": "Whether this is a post or comment"
+    },
+    "equipment": {
+      "type": "object",
+      "properties": {
+        "vin": {
+          "type": ["string", "null"],
+          "pattern": "^[A-HJ-NPR-Z0-9]{17}$",
+          "description": "Vehicle VIN if mentioned"
+        },
+        "make": {
+          "type": ["string", "null"],
+          "maxLength": 50,
+          "description": "Vehicle make"
+        },
+        "model": {
+          "type": ["string", "null"],
+          "maxLength": 50,
+          "description": "Vehicle model"
+        },
+        "year": {
+          "type": ["integer", "null"],
+          "minimum": 1980,
+          "maximum": 2030,
+          "description": "Vehicle year"
+        },
+        "engine": {
+          "type": ["string", "null"],
+          "maxLength": 100,
+          "description": "Engine type or specification"
+        },
+        "mileage": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 1000000,
+          "description": "Vehicle mileage"
+        },
+        "transmission": {
+          "type": ["string", "null"],
+          "enum": ["manual", "automatic", "cvt", "dual_clutch"],
+          "description": "Transmission type"
+        }
+      },
+      "additionalProperties": false
+    },
+    "diagnostic_codes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[PBCU]\\d{4}$",
+            "description": "Diagnostic trouble code"
+          },
+          "description": {
+            "type": ["string", "null"],
+            "maxLength": 500,
+            "description": "Code description if provided"
+          },
+          "status": {
+            "type": ["string", "null"],
+            "enum": ["current", "pending", "permanent", "history"],
+            "description": "Code status"
+          }
+        },
+        "required": ["code"],
+        "additionalProperties": false
+      },
+      "description": "Diagnostic trouble codes mentioned"
+    },
+    "symptoms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 200
+      },
+      "description": "Symptoms described in the post"
+    },
+    "solutions_attempted": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 300
+      },
+      "description": "Solutions or repairs attempted"
+    },
+    "cost": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100000,
+      "description": "Repair cost mentioned (USD, max $100k)"
+    },
+    "resolution": {
+      "type": "object",
+      "properties": {
+        "was_resolved": {
+          "type": ["boolean", "null"],
+          "description": "Whether the issue was resolved"
+        },
+        "solution": {
+          "type": ["string", "null"],
+          "maxLength": 1000,
+          "description": "Final solution that worked"
+        },
+        "parts_replaced": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "description": "Parts that were replaced"
+        },
+        "labor_hours": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Labor hours required"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sentiment": {
+      "type": "object",
+      "properties": {
+        "overall_sentiment": {
+          "type": ["string", "null"],
+          "enum": ["very_negative", "negative", "neutral", "positive", "very_positive"],
+          "description": "Overall sentiment of the post"
+        },
+        "frustration_level": {
+          "type": ["string", "null"],
+          "enum": ["low", "medium", "high", "extreme"],
+          "description": "Level of frustration expressed"
+        },
+        "helpfulness_score": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "How helpful the post is (0-1)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "string",
+      "pattern": "^reddit_[a-z0-9_]+$",
+      "description": "Reddit scraper source identifier"
+    },
+    "source_metadata": {
+      "type": "object",
+      "properties": {
+        "scraper_version": {
+          "type": ["string", "null"],
+          "maxLength": 20,
+          "description": "Version of scraper used"
+        },
+        "api_endpoint": {
+          "type": ["string", "null"],
+          "maxLength": 200,
+          "description": "Reddit API endpoint used"
+        },
+        "rate_limit_remaining": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "API rate limit remaining at time of scrape"
+        },
+        "collection_method": {
+          "type": ["string", "null"],
+          "enum": ["api", "web_scraping", "pushshift", "manual"],
+          "description": "Method used to collect the data"
+        }
+      },
+      "additionalProperties": false
+    },
+    "import_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the record was imported into database"
+    },
+    "data_quality": {
+      "type": "object",
+      "properties": {
+        "extraction_confidence": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Confidence in data extraction accuracy (0-1)"
+        },
+        "text_quality_score": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Quality score of the text content (0-1)"
+        },
+        "contains_diagnostic_info": {
+          "type": ["boolean", "null"],
+          "description": "Whether post contains diagnostic information"
+        },
+        "language_detected": {
+          "type": ["string", "null"],
+          "pattern": "^[a-z]{2}$",
+          "description": "Detected language (ISO 639-1)"
+        },
+        "is_spam": {
+          "type": ["boolean", "null"],
+          "description": "Whether post appears to be spam"
+        }
+      },
+      "additionalProperties": false
+    },
+    "is_active": {
+      "type": ["boolean", "null"],
+      "default": true,
+      "description": "Whether record is active (not deleted/removed)"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when record was created"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when record was last updated"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "description": "VIN format validation for automotive posts",
+      "if": {
+        "properties": {
+          "equipment": {
+            "properties": {
+              "vin": {"type": "string"}
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "equipment": {
+            "properties": {
+              "vin": {
+                "pattern": "^[A-HJ-NPR-Z0-9]{17}$"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "Import must be after original post timestamp",
+      "if": {
+        "properties": {
+          "timestamp": {"type": "string"},
+          "import_timestamp": {"type": "string"}
+        }
+      },
+      "then": {
+        "properties": {
+          "import_timestamp": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "description": "Timestamp must be after Reddit founding date (2005-06-23)",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    {
+      "description": "Comment ID required for comments",
+      "if": {
+        "properties": {
+          "source_type": {"const": "comment"}
+        }
+      },
+      "then": {
+        "properties": {
+          "comment_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "description": "Post ID required for posts",
+      "if": {
+        "properties": {
+          "source_type": {"const": "post"}
+        }
+      },
+      "then": {
+        "properties": {
+          "post_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "description": "Title only applicable for posts",
+      "if": {
+        "properties": {
+          "source_type": {"const": "comment"}
+        }
+      },
+      "then": {
+        "properties": {
+          "title": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}

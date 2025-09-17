@@ -1,0 +1,278 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://diagnosticpro.com/schemas/equipment_registry.json",
+  "title": "Equipment Registry",
+  "description": "Universal equipment tracking and management schema",
+  "type": "object",
+  "required": [
+    "id",
+    "identification_primary_type",
+    "identification_primary",
+    "equipment_category",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "UUID v4 primary identifier"
+    },
+    "identification_primary_type": {
+      "type": "string",
+      "enum": ["vin", "serial_number", "asset_tag", "imei", "mac_address", "custom"],
+      "description": "Type of primary identification"
+    },
+    "identification_primary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "Primary identification value - unique across all equipment"
+    },
+    "equipment_category": {
+      "type": "string",
+      "enum": ["automotive", "heavy_equipment", "electronics", "machinery", "appliances", "marine", "agricultural"],
+      "description": "Primary equipment category"
+    },
+    "equipment_details": {
+      "type": "object",
+      "properties": {
+        "manufacturer": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Equipment manufacturer name"
+        },
+        "model": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Equipment model name"
+        },
+        "model_year": {
+          "type": "integer",
+          "minimum": 1900,
+          "maximum": 2030,
+          "description": "Model year (allows future model years)"
+        },
+        "manufacture_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of manufacture"
+        },
+        "color": {
+          "type": "string",
+          "maxLength": 50,
+          "description": "Primary color"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Detailed equipment description"
+        }
+      },
+      "additionalProperties": false
+    },
+    "physical": {
+      "type": "object",
+      "properties": {
+        "weight_lbs": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000,
+          "description": "Weight in pounds (max 500 tons)"
+        },
+        "dimensions_inches": {
+          "type": "object",
+          "properties": {
+            "length": {
+              "type": "number",
+              "minimum": 0
+            },
+            "width": {
+              "type": "number",
+              "minimum": 0
+            },
+            "height": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "economics": {
+      "type": "object",
+      "properties": {
+        "original_msrp": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Original MSRP value"
+        },
+        "currency_code": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "ISO 4217 currency code"
+        },
+        "depreciation_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Annual depreciation rate as decimal"
+        }
+      },
+      "additionalProperties": false
+    },
+    "power": {
+      "type": "object",
+      "properties": {
+        "voltage_primary": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000,
+          "description": "Primary voltage (industrial equipment can have high voltage)"
+        },
+        "amperage_max": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum amperage"
+        },
+        "horsepower": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Engine/motor horsepower"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ownership": {
+      "type": "object",
+      "properties": {
+        "owner_id": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+          "description": "UUID of equipment owner (references users.id)"
+        },
+        "operator_id": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+          "description": "UUID of equipment operator (references users.id)"
+        },
+        "organization_id": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+          "description": "UUID of owning organization"
+        },
+        "gps_coordinates": {
+          "type": "object",
+          "properties": {
+            "latitude": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            },
+            "longitude": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            }
+          },
+          "required": ["latitude", "longitude"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "registration": {
+      "type": "object",
+      "properties": {
+        "registration_number": {
+          "type": "string",
+          "maxLength": 50,
+          "description": "Government registration number"
+        },
+        "registration_state": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$",
+          "description": "Two-letter state code"
+        },
+        "registration_expiry": {
+          "type": "string",
+          "format": "date",
+          "description": "Registration expiration date"
+        }
+      },
+      "additionalProperties": false
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when record was created"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when record was last updated"
+    },
+    "deleted_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Timestamp when record was soft deleted (null if active)"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether equipment is active"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "identification_primary_type": {"const": "vin"}
+        }
+      },
+      "then": {
+        "properties": {
+          "identification_primary": {
+            "pattern": "^[A-HJ-NPR-Z0-9]{17}$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "equipment_category": {"const": "automotive"}
+        }
+      },
+      "then": {
+        "properties": {
+          "identification_primary": {
+            "pattern": "^[A-HJ-NPR-Z0-9]{17}$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "economics": {
+            "properties": {
+              "original_msrp": {"type": "number"}
+            },
+            "required": ["original_msrp"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "economics": {
+            "required": ["currency_code"]
+          }
+        }
+      }
+    }
+  ]
+}

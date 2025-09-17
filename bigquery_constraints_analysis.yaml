@@ -1,0 +1,673 @@
+# BigQuery Schema Constraints Analysis
+# Generated: 2025-09-16
+# Source: BIGQUERY_FIXED_DEPLOYMENT.sql
+
+database_constraints:
+  project_id: "diagnostic-pro-start-up"
+  dataset: "repair_diagnostics"
+
+  tables:
+    users:
+      primary_key: "id"
+      not_null_constraints:
+        - id
+        - email
+        - password_hash
+        - user_type
+
+      required_struct_fields:
+        profile:
+          optional_fields:
+            - first_name
+            - last_name
+            - phone
+            - avatar_url
+            - timezone
+            - language
+            - country
+
+        auth:
+          optional_fields:
+            - mfa_enabled
+            - mfa_secret
+            - mfa_backup_codes
+            - failed_login_attempts
+            - locked_until
+            - password_reset_token
+            - password_reset_expires
+
+        metadata:
+          optional_fields:
+            - source
+            - referral_code
+            - utm_campaign
+            - utm_source
+            - utm_medium
+            - custom_fields
+
+      default_values:
+        - created_at: "CURRENT_TIMESTAMP()"
+        - updated_at: "CURRENT_TIMESTAMP()"
+
+      partitioning:
+        type: "DATE"
+        column: "created_at"
+
+      clustering:
+        - user_type
+        - email
+
+    equipment_registry:
+      primary_key: "id"
+      not_null_constraints:
+        - id
+        - identification_primary_type
+        - identification_primary
+        - equipment_category
+
+      required_struct_fields:
+        equipment_details:
+          optional_fields:
+            - subcategory
+            - manufacturer
+            - brand
+            - model
+            - model_variant
+            - model_year
+            - manufacture_date
+            - purchase_date
+            - warranty_expiration
+            - end_of_life_date
+
+        physical:
+          nested_structs:
+            dimensions_inches:
+              - length
+              - width
+              - height
+          optional_fields:
+            - size_classification
+            - weight_lbs
+            - color
+            - material
+
+        economics:
+          optional_fields:
+            - original_msrp
+            - current_value
+            - currency_code
+            - insurance_value
+            - replacement_cost
+            - depreciation_rate
+
+        power:
+          optional_fields:
+            - source
+            - voltage_primary
+            - amperage_max
+            - wattage_max
+            - battery_type
+            - fuel_type
+            - fuel_capacity_gallons
+
+        usage:
+          optional_fields:
+            - environment
+            - duty_cycle
+            - expected_lifespan_years
+            - operating_hours
+            - total_miles
+            - total_cycles
+
+        ownership:
+          optional_fields:
+            - owner_type
+            - owner_id
+            - operator_id
+            - location_type
+            - location_country
+            - location_state
+            - location_city
+            - gps_coordinates
+
+        compliance:
+          optional_fields:
+            - regulatory
+            - safety_certifications
+            - recall_status
+            - recall_details
+
+      default_values:
+        - created_at: "CURRENT_TIMESTAMP()"
+        - updated_at: "CURRENT_TIMESTAMP()"
+
+      partitioning:
+        type: "DATE"
+        column: "created_at"
+
+      clustering:
+        - equipment_category
+        - identification_primary_type
+
+    sensor_telemetry:
+      primary_key: null  # Time-series table without traditional PK
+      not_null_constraints:
+        - reading_date
+        - equipment_id
+        - sensor_id
+        - reading_timestamp
+        - reading_value
+
+      foreign_key_relationships:
+        equipment_id:
+          references_table: "equipment_registry"
+          references_column: "id"
+          relationship_type: "logical"
+
+      required_struct_fields:
+        quality:
+          optional_fields:
+            - confidence_score
+            - is_validated
+            - is_anomaly
+            - anomaly_score
+            - error_code
+
+        context:
+          optional_fields:
+            - location
+            - weather_condition
+            - operating_mode
+            - operator_id
+
+      default_values:
+        - ingestion_timestamp: "CURRENT_TIMESTAMP()"
+
+      partitioning:
+        type: "DATE"
+        column: "reading_date"
+        retention_days: 730
+        require_filter: true
+
+      clustering:
+        - equipment_id
+        - sensor_type
+        - reading_timestamp
+
+    models:
+      primary_key: "model_id"
+      not_null_constraints:
+        - model_id
+        - model_name
+
+      required_struct_fields:
+        version_info:
+          optional_fields:
+            - version_number
+            - git_commit_hash
+            - created_by
+            - created_at
+            - is_production
+            - is_champion
+
+        features:
+          optional_fields:
+            - input_features
+            - target_variable
+            - feature_importance
+            - preprocessing_steps
+
+        metrics:
+          optional_fields:
+            - training_metrics
+            - validation_metrics
+            - test_metrics
+            - production_metrics
+
+        training:
+          optional_fields:
+            - dataset_id
+            - training_start
+            - training_end
+            - training_duration_seconds
+            - training_rows
+            - compute_resources
+
+        deployment:
+          optional_fields:
+            - deployed_at
+            - endpoint_url
+            - serving_framework
+            - auto_scaling_enabled
+            - max_instances
+            - min_instances
+
+        artifacts:
+          optional_fields:
+            - model_path
+            - preprocessor_path
+            - metadata_path
+            - artifact_size_mb
+
+      default_values:
+        - created_at: "CURRENT_TIMESTAMP()"
+        - updated_at: "CURRENT_TIMESTAMP()"
+
+      partitioning:
+        type: "DATE"
+        column: "created_at"
+
+      clustering:
+        - model_type
+        - model_name
+
+    feature_store:
+      primary_key: null  # Composite key: feature_date + entity_id + entity_type
+      not_null_constraints:
+        - feature_date
+        - entity_id
+        - entity_type
+        - feature_set_name
+        - feature_set_version
+
+      foreign_key_relationships:
+        entity_id:
+          references_table: "equipment_registry"
+          references_column: "id"
+          relationship_type: "logical"
+          condition: "when entity_type = 'equipment'"
+
+      required_struct_fields:
+        features:
+          optional_fields:
+            - equipment_age_days
+            - total_operating_hours
+            - avg_daily_usage_hours
+            - failure_count_30d
+            - failure_count_90d
+            - maintenance_score
+            - environmental_risk_score
+            - usage_intensity_score
+
+        data_quality:
+          optional_fields:
+            - completeness_score
+            - freshness_hours
+            - anomaly_flags
+
+      default_values:
+        - computed_at: "CURRENT_TIMESTAMP()"
+
+      partitioning:
+        type: "DATE"
+        column: "feature_date"
+        retention_days: 90
+
+      clustering:
+        - entity_type
+        - entity_id
+
+    diagnostic_sessions:
+      primary_key: "session_id"
+      not_null_constraints:
+        - session_id
+        - session_date
+        - equipment_id
+
+      foreign_key_relationships:
+        equipment_id:
+          references_table: "equipment_registry"
+          references_column: "id"
+          relationship_type: "logical"
+        technician_id:
+          references_table: "users"
+          references_column: "id"
+          relationship_type: "logical"
+        customer_id:
+          references_table: "users"
+          references_column: "id"
+          relationship_type: "logical"
+
+      required_struct_fields:
+        symptoms:
+          array_element_fields:
+            - symptom_type
+            - description
+            - severity
+            - frequency
+            - conditions
+
+        diagnostic_codes:
+          array_element_fields:
+            - code
+            - code_type
+            - description
+            - freeze_frame_data
+
+        tests_performed:
+          array_element_fields:
+            - test_name
+            - test_type
+            - result
+            - values
+            - passed
+
+        findings:
+          optional_fields:
+            - root_cause
+            - affected_systems
+            - severity_level
+            - immediate_action_required
+
+        recommendations:
+          array_element_fields:
+            - action
+            - priority
+            - estimated_cost
+            - estimated_hours
+            - parts_required
+
+        resolution:
+          optional_fields:
+            - actions_taken
+            - parts_replaced
+            - labor_hours
+            - total_cost
+            - warranty_covered
+            - customer_satisfied
+
+        media:
+          array_element_fields:
+            - media_type
+            - media_url
+            - thumbnail_url
+            - caption
+
+      default_values:
+        - started_at: "CURRENT_TIMESTAMP()"
+
+      validation_rules:
+        dtc_codes:
+          pattern: "^[PBCU]\\d{4}$"
+          description: "DTC codes must match format: P/B/C/U + 4 digits"
+          examples:
+            - "P0301"
+            - "B1342"
+            - "C0035"
+            - "U0100"
+
+      partitioning:
+        type: "DATE"
+        column: "session_date"
+        retention_days: 2555  # 7 years for compliance
+
+      clustering:
+        - equipment_id
+        - session_type
+
+    parts_inventory:
+      primary_key: "part_id"
+      not_null_constraints:
+        - part_id
+        - part_number
+
+      required_struct_fields:
+        part_info:
+          optional_fields:
+            - manufacturer
+            - brand
+            - description
+            - category
+            - subcategory
+            - oem_numbers
+            - superseded_by
+
+        availability:
+          array_element_fields:
+            - location_id
+            - location_type
+            - quantity_on_hand
+            - quantity_available
+            - quantity_reserved
+            - reorder_point
+            - reorder_quantity
+            - lead_time_days
+
+        suppliers:
+          array_element_fields:
+            - supplier_id
+            - supplier_name
+            - supplier_part_number
+            - cost
+            - currency
+            - moq
+            - lead_time_days
+            - last_order_date
+            - quality_score
+
+        compatible_models:
+          array_element_fields:
+            - make
+            - model
+            - years
+
+        pricing:
+          optional_fields:
+            - list_price
+            - dealer_cost
+            - core_charge
+            - environmental_fee
+            - currency
+
+        specifications:
+          nested_structs:
+            dimensions_inches:
+              - length
+              - width
+              - height
+          optional_fields:
+            - weight_lbs
+            - material
+            - color
+            - warranty_months
+
+        metrics:
+          optional_fields:
+            - demand_forecast_30d
+            - demand_forecast_90d
+            - turnover_rate
+            - stockout_risk_score
+            - obsolescence_risk_score
+
+      default_values:
+        - created_at: "CURRENT_TIMESTAMP()"
+        - updated_at: "CURRENT_TIMESTAMP()"
+
+      clustering:
+        - part_number
+
+    maintenance_predictions:
+      primary_key: "prediction_id"
+      not_null_constraints:
+        - prediction_id
+        - prediction_date
+        - equipment_id
+
+      foreign_key_relationships:
+        equipment_id:
+          references_table: "equipment_registry"
+          references_column: "id"
+          relationship_type: "logical"
+
+      required_struct_fields:
+        predictions:
+          array_element_fields:
+            - component_type
+            - failure_mode
+            - probability
+            - confidence_interval
+            - predicted_failure_date
+            - days_until_failure
+            - risk_level
+            - model_id
+            - model_version
+
+        maintenance_actions:
+          array_element_fields:
+            - action_type
+            - component
+            - priority
+            - recommended_date
+            - estimated_cost
+            - estimated_downtime_hours
+            - parts_needed
+            - preventable_failure_cost
+            - roi_ratio
+
+        risk_assessment:
+          optional_fields:
+            - overall_risk_score
+            - safety_risk
+            - operational_risk_level
+            - financial_impact
+            - downtime_impact_hours
+
+        model_metadata:
+          optional_fields:
+            - ensemble_models
+            - feature_importance
+            - explanation
+
+      default_values:
+        - generated_at: "CURRENT_TIMESTAMP()"
+
+      partitioning:
+        type: "DATE"
+        column: "prediction_date"
+        retention_days: 365
+
+      clustering:
+        - equipment_id
+
+  materialized_views:
+    daily_diagnostic_metrics:
+      depends_on:
+        - diagnostic_sessions
+        - equipment_registry
+
+      partitioning:
+        type: "DATE"
+        column: "metric_date"
+
+      clustering:
+        - equipment_category
+
+      aggregations:
+        - total_sessions
+        - unique_equipment
+        - active_technicians
+        - avg_repair_cost
+        - avg_duration_minutes
+        - total_revenue
+        - warranty_repairs
+        - satisfaction_rate
+
+  user_defined_functions:
+    calculate_equipment_age:
+      parameters:
+        - manufacture_date: "DATE"
+        - purchase_date: "DATE"
+      returns: "INT64"
+      description: "Calculate equipment age in days"
+
+    parse_vin_manufacturer:
+      parameters:
+        - vin: "STRING"
+      returns: "STRING"
+      language: "JavaScript"
+      description: "Extract manufacturer from VIN"
+
+    calculate_failure_probability:
+      parameters:
+        - operating_hours: "NUMERIC"
+        - age_days: "INT64"
+        - failure_history_count: "INT64"
+      returns: "NUMERIC"
+      description: "Calculate failure probability based on usage and history"
+
+  logical_relationships:
+    # Primary relationships identified by foreign key patterns
+    equipment_ownership:
+      - equipment_registry.ownership.owner_id → users.id
+      - equipment_registry.ownership.operator_id → users.id
+
+    diagnostic_workflow:
+      - diagnostic_sessions.equipment_id → equipment_registry.id
+      - diagnostic_sessions.technician_id → users.id
+      - diagnostic_sessions.customer_id → users.id
+
+    sensor_data:
+      - sensor_telemetry.equipment_id → equipment_registry.id
+
+    maintenance_planning:
+      - maintenance_predictions.equipment_id → equipment_registry.id
+
+    ml_features:
+      - feature_store.entity_id → equipment_registry.id (when entity_type = 'equipment')
+
+  business_rules:
+    dtc_code_format:
+      pattern: "^[PBCU]\\d{4}$"
+      description: "Diagnostic Trouble Codes must follow OBD-II standard"
+      categories:
+        P: "Powertrain"
+        B: "Body"
+        C: "Chassis"
+        U: "Network/Communication"
+
+    identification_types:
+      vehicle: "VIN"
+      serial_number: "SN"
+      model_number: "MN"
+      asset_tag: "AT"
+
+    user_types:
+      - customer
+      - technician
+      - administrator
+      - shop_owner
+
+    equipment_categories:
+      - automotive
+      - heavy_equipment
+      - electronics
+      - machinery
+      - appliances
+
+  cost_optimization:
+    partition_expiration:
+      sensor_telemetry: 730  # 2 years
+      feature_store: 90      # 3 months
+      maintenance_predictions: 365  # 1 year
+      diagnostic_sessions: 2555     # 7 years (compliance)
+
+    require_partition_filter:
+      - sensor_telemetry
+
+    clustering_benefits:
+      - Improved query performance for filtered operations
+      - Reduced data scanning for common query patterns
+      - Cost optimization through data locality
+
+  data_quality_rules:
+    required_validations:
+      - All equipment must have valid identification_primary
+      - DTC codes must match standard format
+      - Sensor readings must have valid timestamps
+      - User emails must be unique
+      - Part numbers must be unique within manufacturer
+
+    referential_integrity:
+      - All equipment_id references must exist in equipment_registry
+      - All user_id references must exist in users table
+      - All model_id references must exist in models table

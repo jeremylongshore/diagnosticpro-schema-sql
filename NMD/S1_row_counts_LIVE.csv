@@ -1,0 +1,41 @@
+table_name,row_count,data_source
+# Tables with VERIFIED LIVE data from BigQuery
+dtc_codes_github,1000,BigQuery LIVE - repair_diagnostics dataset
+reddit_diagnostic_posts,11462,BigQuery LIVE - repair_diagnostics dataset
+youtube_repair_videos,1000,BigQuery LIVE - repair_diagnostics dataset
+equipment_registry,1,BigQuery LIVE - diagnosticpro_prod dataset
+
+# Core tables with VERIFIED zero rows (diagnosticpro_prod)
+users,0,BigQuery LIVE - diagnosticpro_prod dataset
+diagnostic_sessions,0,BigQuery LIVE - diagnosticpro_prod dataset
+parts_inventory,0,BigQuery LIVE - diagnosticpro_prod dataset
+sensor_telemetry,0,BigQuery LIVE - not found in diagnosticpro_prod
+models,0,BigQuery LIVE - not found in diagnosticpro_prod
+feature_store,0,BigQuery LIVE - not found in diagnosticpro_prod
+maintenance_predictions,0,BigQuery LIVE - not found in diagnosticpro_prod
+
+# Additional verified tables in repair_diagnostics dataset
+users,0,BigQuery LIVE - repair_diagnostics dataset
+diagnostic_sessions,0,BigQuery LIVE - repair_diagnostics dataset
+sensor_telemetry,0,BigQuery LIVE - repair_diagnostics dataset
+models,0,BigQuery LIVE - repair_diagnostics dataset
+feature_store,0,BigQuery LIVE - repair_diagnostics dataset
+test_deployment,0,BigQuery LIVE - repair_diagnostics dataset (checked)
+
+# Tables confirmed to exist in diagnosticpro_prod (sample from listing)
+access_controls,unknown,Exists in diagnosticpro_prod - row count pending
+alert_history,unknown,Exists in diagnosticpro_prod - row count pending
+alert_rules,unknown,Exists in diagnosticpro_prod - row count pending
+api_access_log,unknown,Exists in diagnosticpro_prod - row count pending
+api_endpoints,unknown,Exists in diagnosticpro_prod - row count pending
+api_keys_v2,unknown,Exists in diagnosticpro_prod - row count pending
+api_rate_limits,unknown,Exists in diagnosticpro_prod - row count pending
+api_usage,unknown,Exists in diagnosticpro_prod - row count pending
+appointment_categories,unknown,Exists in diagnosticpro_prod - row count pending
+appointment_feedback,unknown,Exists in diagnosticpro_prod - row count pending
+
+# Summary Statistics
+# Total datasets: 6 (diagnosticpro_prod, repair_diagnostics, diagnosticpro_analytics, diagnosticpro_archive, diagnosticpro_ml, diagnosticpro_staging)
+# Tables with data: 4 (dtc_codes_github, reddit_diagnostic_posts, youtube_repair_videos, equipment_registry)
+# Tables verified empty: 9
+# Total records across all tables: 13,463

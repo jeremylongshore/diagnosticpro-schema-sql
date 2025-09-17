@@ -1,0 +1,183 @@
+{
+  "format": "parquet_equivalent",
+  "note": "This is a JSON representation of the data that would be in Parquet format",
+  "original_file": "reddit_diagnostic_posts.ndjson",
+  "record_count": 5,
+  "data": [
+    {
+      "url": "https://www.reddit.com/r/MechanicAdvice/comments/abc123/p0301_code_help/",
+      "post_id": "abc123",
+      "title": "P0301 code - need help diagnosing",
+      "content": "My 2018 Honda Civic is throwing a P0301 code. Engine is misfiring and shaking at idle. Already tried new spark plugs but issue persists. Any ideas?",
+      "author": "car_owner_2024",
+      "subreddit": "MechanicAdvice",
+      "score": 15,
+      "num_comments": 8,
+      "timestamp": "2025-09-17T08:45:00Z",
+      "source_type": "post",
+      "equipment": {
+        "make": "Honda",
+        "model": "Civic",
+        "year": 2018,
+        "mileage": 45000,
+        "transmission": "automatic"
+      },
+      "diagnostic_codes": [
+        {
+          "code": "P0301",
+          "description": "Cylinder 1 Misfire Detected",
+          "status": "current"
+        }
+      ],
+      "symptoms": [
+        "Engine shake",
+        "Rough idle",
+        "Check engine light"
+      ],
+      "solutions_attempted": [
+        "Replaced spark plugs",
+        "Checked air filter"
+      ],
+      "source": "reddit_mechanic_advice",
+      "import_timestamp": "2025-09-17T09:00:00Z"
+    },
+    {
+      "url": "https://www.reddit.com/r/MechanicAdvice/comments/def456/transmission_slipping_2015_ford/comment/xyz789",
+      "comment_id": "xyz789",
+      "content": "I had the same issue with my 2015 Ford Focus. Turned out to be low transmission fluid. Check your fluid level first before spending money on a rebuild. Cost me $35 for fluid vs $3000 for rebuild.",
+      "author": "ford_mechanic_pro",
+      "subreddit": "MechanicAdvice",
+      "score": 42,
+      "timestamp": "2025-09-16T15:30:00Z",
+      "source_type": "comment",
+      "equipment": {
+        "make": "Ford",
+        "model": "Focus",
+        "year": 2015,
+        "transmission": "automatic"
+      },
+      "symptoms": [
+        "Transmission slipping",
+        "Delayed engagement"
+      ],
+      "solutions_attempted": [
+        "Transmission fluid change"
+      ],
+      "cost": 35.0,
+      "resolution": {
+        "was_resolved": true,
+        "solution": "Transmission fluid was low, added 2 quarts and problem resolved",
+        "parts_replaced": [
+          "Transmission fluid"
+        ],
+        "labor_hours": 0.5
+      },
+      "source": "reddit_auto_community",
+      "import_timestamp": "2025-09-16T16:00:00Z"
+    },
+    {
+      "url": "https://www.reddit.com/r/Cartalk/comments/ghi789/bmw_e90_cooling_issues/",
+      "post_id": "ghi789",
+      "title": "BMW E90 overheating after water pump replacement",
+      "content": "Just replaced the water pump on my 2008 BMW 328i and now it's overheating worse than before. Coolant level is fine, no leaks visible. Getting frustrated. What could I have missed?",
+      "author": "bmw_e90_owner",
+      "subreddit": "Cartalk",
+      "score": 7,
+      "num_comments": 12,
+      "timestamp": "2025-09-15T20:15:00Z",
+      "source_type": "post",
+      "equipment": {
+        "vin": "WBAVA37508NM12345",
+        "make": "BMW",
+        "model": "328i",
+        "year": 2008,
+        "engine": "N52 3.0L",
+        "mileage": 145000
+      },
+      "symptoms": [
+        "Overheating",
+        "Temperature gauge maxed",
+        "Steam from engine bay"
+      ],
+      "solutions_attempted": [
+        "Water pump replacement",
+        "Coolant flush",
+        "Thermostat replacement"
+      ],
+      "cost": 850.0,
+      "source": "reddit_european_cars",
+      "import_timestamp": "2025-09-15T21:00:00Z"
+    },
+    {
+      "url": "https://www.reddit.com/r/AskMechanics/comments/jkl012/diesel_truck_black_smoke/",
+      "post_id": "jkl012",
+      "title": "2019 Chevy Silverado 2500HD - excessive black smoke",
+      "content": "My diesel Silverado is blowing black smoke under acceleration. Truck has 75k miles. No codes showing. Performance seems normal otherwise. Is this normal for diesel or should I be concerned? Truck is still under warranty.",
+      "author": "truck_driver_mike",
+      "subreddit": "AskMechanics",
+      "score": 23,
+      "num_comments": 16,
+      "timestamp": "2025-09-14T12:30:00Z",
+      "source_type": "post",
+      "equipment": {
+        "make": "Chevrolet",
+        "model": "Silverado 2500HD",
+        "year": 2019,
+        "engine": "6.6L Duramax Diesel",
+        "mileage": 75000,
+        "transmission": "automatic"
+      },
+      "symptoms": [
+        "Black smoke on acceleration",
+        "Reduced fuel economy"
+      ],
+      "solutions_attempted": [
+        "Fuel system cleaner"
+      ],
+      "source": "reddit_diesel_trucks",
+      "import_timestamp": "2025-09-14T13:00:00Z"
+    },
+    {
+      "url": "https://www.reddit.com/r/MechanicAdvice/comments/mno345/airbag_light_toyota_prius/comment/rst678",
+      "comment_id": "rst678",
+      "content": "Same thing happened to my 2012 Prius. It was the passenger seat occupancy sensor. Toyota has a known issue with these sensors failing around 100k miles. Part number 89460-47030. Dealer wanted $400, I found the part online for $180 and installed myself. Pretty easy DIY job.",
+      "author": "prius_expert_2024",
+      "subreddit": "MechanicAdvice",
+      "score": 28,
+      "timestamp": "2025-09-13T09:45:00Z",
+      "source_type": "comment",
+      "equipment": {
+        "make": "Toyota",
+        "model": "Prius",
+        "year": 2012,
+        "mileage": 105000,
+        "transmission": "cvt"
+      },
+      "diagnostic_codes": [
+        {
+          "code": "B1650",
+          "description": "Passenger Seat Occupancy Sensor Circuit",
+          "status": "current"
+        }
+      ],
+      "symptoms": [
+        "Airbag warning light",
+        "Passenger airbag disabled"
+      ],
+      "solutions_attempted": [
+        "Seat sensor replacement"
+      ],
+      "cost": 180.0,
+      "resolution": {
+        "was_resolved": true,
+        "solution": "Replaced passenger seat occupancy sensor",
+        "parts_replaced": [
+          "Seat occupancy sensor"
+        ],
+        "labor_hours": 1.5
+      },
+      "source": "reddit_toyota_forum",
+      "import_timestamp": "2025-09-13T10:15:00Z"
+    }
+  ]
+}

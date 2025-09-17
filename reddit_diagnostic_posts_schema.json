@@ -1,0 +1,116 @@
+[
+  {
+    "name": "equipment",
+    "type": "RECORD",
+    "mode": "NULLABLE",
+    "description": "Equipment/vehicle information",
+    "fields": [
+      {
+        "name": "make",
+        "type": "STRING",
+        "mode": "NULLABLE",
+        "description": "Vehicle manufacturer"
+      },
+      {
+        "name": "model",
+        "type": "STRING",
+        "mode": "NULLABLE",
+        "description": "Vehicle model"
+      },
+      {
+        "name": "year",
+        "type": "STRING",
+        "mode": "NULLABLE",
+        "description": "Vehicle year"
+      },
+      {
+        "name": "vin",
+        "type": "STRING",
+        "mode": "NULLABLE",
+        "description": "Vehicle identification number"
+      }
+    ]
+  },
+  {
+    "name": "diagnostic_codes",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "description": "Array of diagnostic trouble codes mentioned in the post",
+    "fields": [
+      {
+        "name": "code",
+        "type": "STRING",
+        "mode": "NULLABLE",
+        "description": "DTC code identifier"
+      },
+      {
+        "name": "description",
+        "type": "STRING",
+        "mode": "NULLABLE",
+        "description": "DTC code description"
+      }
+    ]
+  },
+  {
+    "name": "repair_procedure",
+    "type": "RECORD",
+    "mode": "NULLABLE",
+    "description": "Repair procedure information",
+    "fields": [
+      {
+        "name": "steps",
+        "type": "STRING",
+        "mode": "REPEATED",
+        "description": "Array of repair steps or content"
+      },
+      {
+        "name": "has_solution",
+        "type": "BOOLEAN",
+        "mode": "NULLABLE",
+        "description": "Whether the post contains a solution"
+      }
+    ]
+  },
+  {
+    "name": "cost",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Repair cost if mentioned"
+  },
+  {
+    "name": "url",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Original Reddit URL"
+  },
+  {
+    "name": "author",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Reddit username of the author"
+  },
+  {
+    "name": "timestamp",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "When the post was created"
+  },
+  {
+    "name": "source_type",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Type of source (post or comment)"
+  },
+  {
+    "name": "source",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Data source identifier"
+  },
+  {
+    "name": "import_timestamp",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "When the data was imported to the pipeline"
+  }
+]

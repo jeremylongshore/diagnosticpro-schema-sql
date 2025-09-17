@@ -1,0 +1,592 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://diagnosticpro.com/schemas/models.json",
+  "title": "ML Models",
+  "description": "ML model registry and metadata schema",
+  "type": "object",
+  "required": [
+    "model_id",
+    "model_name",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "model_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "UUID v4 model identifier"
+    },
+    "model_name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "maxLength": 100,
+      "description": "Model name in snake_case format"
+    },
+    "display_name": {
+      "type": ["string", "null"],
+      "maxLength": 200,
+      "description": "Human-readable model name"
+    },
+    "description": {
+      "type": ["string", "null"],
+      "maxLength": 2000,
+      "description": "Detailed model description"
+    },
+    "model_type": {
+      "type": ["string", "null"],
+      "enum": [
+        "classification",
+        "regression",
+        "clustering",
+        "anomaly_detection",
+        "forecasting",
+        "recommendation",
+        "nlp",
+        "computer_vision",
+        "reinforcement_learning",
+        "ensemble"
+      ],
+      "description": "Type of machine learning model"
+    },
+    "use_case": {
+      "type": ["string", "null"],
+      "enum": [
+        "predictive_maintenance",
+        "failure_prediction",
+        "cost_estimation",
+        "performance_optimization",
+        "diagnostic_assistance",
+        "anomaly_detection",
+        "parts_recommendation",
+        "pricing_optimization",
+        "customer_segmentation",
+        "demand_forecasting"
+      ],
+      "description": "Primary use case for the model"
+    },
+    "version_info": {
+      "type": "object",
+      "properties": {
+        "version_number": {
+          "type": ["string", "null"],
+          "pattern": "^v?\\d+\\.\\d+\\.\\d+(-[a-z0-9]+)?$",
+          "description": "Semantic version number"
+        },
+        "major_version": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Major version number"
+        },
+        "minor_version": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Minor version number"
+        },
+        "patch_version": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Patch version number"
+        },
+        "git_commit_hash": {
+          "type": ["string", "null"],
+          "pattern": "^[a-f0-9]{40}$",
+          "description": "Full SHA-1 git commit hash"
+        },
+        "git_branch": {
+          "type": ["string", "null"],
+          "maxLength": 100,
+          "description": "Git branch name"
+        },
+        "is_production": {
+          "type": ["boolean", "null"],
+          "default": false,
+          "description": "Whether model is deployed in production"
+        },
+        "is_champion": {
+          "type": ["boolean", "null"],
+          "default": false,
+          "description": "Whether this is the champion model for its use case"
+        },
+        "is_baseline": {
+          "type": ["boolean", "null"],
+          "default": false,
+          "description": "Whether this is a baseline model for comparison"
+        }
+      },
+      "additionalProperties": false
+    },
+    "algorithm": {
+      "type": ["string", "null"],
+      "enum": [
+        "linear_regression",
+        "logistic_regression",
+        "random_forest",
+        "gradient_boosting",
+        "neural_network",
+        "svm",
+        "kmeans",
+        "xgboost",
+        "lightgbm",
+        "catboost",
+        "decision_tree",
+        "naive_bayes",
+        "knn",
+        "isolation_forest",
+        "autoencoder",
+        "lstm",
+        "transformer",
+        "ensemble"
+      ],
+      "description": "Machine learning algorithm used"
+    },
+    "framework": {
+      "type": ["string", "null"],
+      "enum": [
+        "scikit-learn",
+        "tensorflow",
+        "pytorch",
+        "xgboost",
+        "lightgbm",
+        "catboost",
+        "spark_ml",
+        "h2o",
+        "keras",
+        "statsmodels",
+        "prophet",
+        "custom"
+      ],
+      "description": "ML framework used for implementation"
+    },
+    "training": {
+      "type": "object",
+      "properties": {
+        "training_start": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Training start timestamp"
+        },
+        "training_end": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Training completion timestamp"
+        },
+        "training_duration_seconds": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "Training duration in seconds"
+        },
+        "training_rows": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "Number of training samples"
+        },
+        "validation_rows": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "Number of validation samples"
+        },
+        "test_rows": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "Number of test samples"
+        },
+        "feature_count": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "Number of features used"
+        },
+        "hyperparameters": {
+          "type": ["object", "null"],
+          "description": "Model hyperparameters (JSON object)"
+        },
+        "training_config": {
+          "type": ["object", "null"],
+          "description": "Training configuration (JSON object)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "performance": {
+      "type": "object",
+      "properties": {
+        "accuracy": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Model accuracy score"
+        },
+        "precision": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Model precision score"
+        },
+        "recall": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Model recall score"
+        },
+        "f1_score": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "F1 score"
+        },
+        "auc_roc": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Area under ROC curve"
+        },
+        "mse": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "description": "Mean squared error (for regression)"
+        },
+        "rmse": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "description": "Root mean squared error"
+        },
+        "mae": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "description": "Mean absolute error"
+        },
+        "r2_score": {
+          "type": ["number", "null"],
+          "minimum": -1.0,
+          "maximum": 1.0,
+          "description": "R-squared score"
+        },
+        "cross_validation_score": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Cross-validation score"
+        }
+      },
+      "additionalProperties": false
+    },
+    "deployment": {
+      "type": "object",
+      "properties": {
+        "deployment_environment": {
+          "type": ["string", "null"],
+          "enum": ["development", "staging", "production", "testing"],
+          "description": "Deployment environment"
+        },
+        "deployment_date": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "When model was deployed"
+        },
+        "endpoint_url": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "maxLength": 500,
+          "description": "Model serving endpoint URL"
+        },
+        "container_image": {
+          "type": ["string", "null"],
+          "maxLength": 200,
+          "description": "Docker container image reference"
+        },
+        "scaling_config": {
+          "type": "object",
+          "properties": {
+            "min_instances": {
+              "type": ["integer", "null"],
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Minimum number of instances"
+            },
+            "max_instances": {
+              "type": ["integer", "null"],
+              "minimum": 1,
+              "maximum": 1000,
+              "description": "Maximum number of instances"
+            },
+            "target_cpu_utilization": {
+              "type": ["number", "null"],
+              "minimum": 0.1,
+              "maximum": 1.0,
+              "description": "Target CPU utilization for scaling"
+            }
+          },
+          "additionalProperties": false
+        },
+        "monitoring_config": {
+          "type": ["object", "null"],
+          "description": "Monitoring and alerting configuration"
+        }
+      },
+      "additionalProperties": false
+    },
+    "data_requirements": {
+      "type": "object",
+      "properties": {
+        "input_schema": {
+          "type": ["object", "null"],
+          "description": "JSON schema for model inputs"
+        },
+        "output_schema": {
+          "type": ["object", "null"],
+          "description": "JSON schema for model outputs"
+        },
+        "feature_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "description": "Required feature names"
+        },
+        "data_sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "description": "Data sources used for training"
+        },
+        "preprocessing_steps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": "Data preprocessing steps"
+        }
+      },
+      "additionalProperties": false
+    },
+    "business_metrics": {
+      "type": "object",
+      "properties": {
+        "business_value": {
+          "type": ["number", "null"],
+          "description": "Estimated business value in dollars"
+        },
+        "cost_savings": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Estimated cost savings in dollars"
+        },
+        "accuracy_improvement": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Accuracy improvement over baseline"
+        },
+        "prediction_latency_ms": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "Average prediction latency in milliseconds"
+        },
+        "throughput_predictions_per_second": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Predictions per second throughput"
+        }
+      },
+      "additionalProperties": false
+    },
+    "model_artifacts": {
+      "type": "object",
+      "properties": {
+        "model_file_path": {
+          "type": ["string", "null"],
+          "maxLength": 500,
+          "description": "Path to serialized model file"
+        },
+        "model_size_bytes": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Model file size in bytes"
+        },
+        "preprocessing_artifacts": {
+          "type": ["string", "null"],
+          "maxLength": 500,
+          "description": "Path to preprocessing artifacts"
+        },
+        "feature_importance": {
+          "type": ["object", "null"],
+          "description": "Feature importance scores"
+        },
+        "model_card_url": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "description": "URL to model card documentation"
+        }
+      },
+      "additionalProperties": false
+    },
+    "governance": {
+      "type": "object",
+      "properties": {
+        "model_owner": {
+          "type": ["string", "null"],
+          "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+          "description": "UUID of model owner (references users.id)"
+        },
+        "approval_status": {
+          "type": ["string", "null"],
+          "enum": ["pending", "approved", "rejected", "under_review"],
+          "description": "Model approval status"
+        },
+        "approved_by": {
+          "type": ["string", "null"],
+          "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+          "description": "UUID of approver"
+        },
+        "approval_date": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Date of approval"
+        },
+        "compliance_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "description": "Compliance requirements this model meets"
+        },
+        "audit_trail": {
+          "type": ["object", "null"],
+          "description": "Audit trail information"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": ["string", "null"],
+      "enum": ["development", "testing", "staging", "production", "deprecated", "archived"],
+      "default": "development",
+      "description": "Current model status"
+    },
+    "is_active": {
+      "type": ["boolean", "null"],
+      "default": true,
+      "description": "Whether model is active"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when record was created"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when record was last updated"
+    },
+    "deleted_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Timestamp when record was soft deleted (null if active)"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "description": "Champion models must be in production",
+      "if": {
+        "properties": {
+          "version_info": {
+            "properties": {
+              "is_champion": {"const": true}
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "version_info": {
+            "properties": {
+              "is_production": {"const": true}
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "Training end must be after training start",
+      "if": {
+        "properties": {
+          "training": {
+            "properties": {
+              "training_start": {"type": "string"},
+              "training_end": {"type": "string"}
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "training": {
+            "properties": {
+              "training_start": {"type": "string"},
+              "training_end": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "Min instances cannot exceed max instances",
+      "if": {
+        "properties": {
+          "deployment": {
+            "properties": {
+              "scaling_config": {
+                "properties": {
+                  "min_instances": {"type": "integer"},
+                  "max_instances": {"type": "integer"}
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "deployment": {
+            "properties": {
+              "scaling_config": {
+                "properties": {
+                  "min_instances": {"type": "integer"},
+                  "max_instances": {"type": "integer"}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "Approval requires approver when approved",
+      "if": {
+        "properties": {
+          "governance": {
+            "properties": {
+              "approval_status": {"const": "approved"}
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "governance": {
+            "required": ["approved_by", "approval_date"],
+            "properties": {
+              "approved_by": {"type": "string"},
+              "approval_date": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  ]
+}

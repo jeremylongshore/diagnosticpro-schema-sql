@@ -1,0 +1,44 @@
+[
+  {
+    "name": "dtc_code",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Diagnostic Trouble Code identifier"
+  },
+  {
+    "name": "description",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Human readable description of the DTC code"
+  },
+  {
+    "name": "category",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "DTC category (B, C, P, U)"
+  },
+  {
+    "name": "category_desc",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Full description of the category"
+  },
+  {
+    "name": "source",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Data source identifier"
+  },
+  {
+    "name": "extraction_date",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "When the data was originally extracted"
+  },
+  {
+    "name": "import_timestamp",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "When the data was imported to the pipeline"
+  }
+]

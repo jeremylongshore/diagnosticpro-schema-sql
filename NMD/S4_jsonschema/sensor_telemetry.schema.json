@@ -1,0 +1,333 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://diagnosticpro.com/schemas/sensor_telemetry.json",
+  "title": "Sensor Telemetry",
+  "description": "IoT sensor readings and telemetry data schema",
+  "type": "object",
+  "required": [
+    "reading_date",
+    "equipment_id",
+    "sensor_id",
+    "reading_timestamp",
+    "reading_value"
+  ],
+  "properties": {
+    "reading_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of reading (used for partitioning)"
+    },
+    "equipment_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "UUID of equipment (references equipment_registry.id)"
+    },
+    "sensor_id": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "description": "Sensor identifier"
+    },
+    "reading_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Exact timestamp of sensor reading"
+    },
+    "reading_value": {
+      "type": "number",
+      "description": "Sensor reading value (must be finite number)"
+    },
+    "sensor_type": {
+      "type": ["string", "null"],
+      "enum": [
+        "temperature",
+        "pressure",
+        "voltage",
+        "current",
+        "rpm",
+        "speed",
+        "fuel_level",
+        "oil_pressure",
+        "coolant_temp",
+        "battery_voltage",
+        "throttle_position",
+        "air_flow",
+        "oxygen",
+        "accelerometer",
+        "gyroscope",
+        "gps",
+        "vibration",
+        "humidity",
+        "light",
+        "proximity",
+        "custom"
+      ],
+      "description": "Type of sensor measurement"
+    },
+    "unit_of_measure": {
+      "type": ["string", "null"],
+      "enum": [
+        "celsius",
+        "fahrenheit",
+        "kelvin",
+        "psi",
+        "bar",
+        "pascal",
+        "volt",
+        "amp",
+        "rpm",
+        "mph",
+        "kph",
+        "liter",
+        "gallon",
+        "percent",
+        "degree",
+        "mg_per_cubic_meter",
+        "g_force",
+        "hertz",
+        "lux",
+        "meter",
+        "inch",
+        "custom"
+      ],
+      "description": "Unit of measurement for the reading"
+    },
+    "quality": {
+      "type": "object",
+      "properties": {
+        "confidence_score": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Confidence in reading accuracy (0-1)"
+        },
+        "anomaly_score": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Anomaly detection score (0-1)"
+        },
+        "reading_quality": {
+          "type": ["string", "null"],
+          "enum": ["good", "uncertain", "bad", "not_available"],
+          "description": "Overall quality assessment"
+        },
+        "noise_level": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Signal noise level"
+        },
+        "calibration_status": {
+          "type": ["string", "null"],
+          "enum": ["calibrated", "needs_calibration", "uncalibrated", "unknown"],
+          "description": "Sensor calibration status"
+        }
+      },
+      "additionalProperties": false
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "operating_conditions": {
+          "type": ["string", "null"],
+          "enum": ["idle", "normal", "heavy_load", "emergency", "maintenance", "shutdown"],
+          "description": "Equipment operating conditions during reading"
+        },
+        "environment_temp": {
+          "type": ["number", "null"],
+          "description": "Ambient temperature during reading"
+        },
+        "environment_humidity": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Ambient humidity percentage"
+        },
+        "location": {
+          "type": "object",
+          "properties": {
+            "latitude": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            },
+            "longitude": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            },
+            "altitude": {
+              "type": ["number", "null"],
+              "description": "Altitude in meters"
+            }
+          },
+          "required": ["latitude", "longitude"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "min_expected_value": {
+          "type": ["number", "null"],
+          "description": "Minimum expected value for this sensor type"
+        },
+        "max_expected_value": {
+          "type": ["number", "null"],
+          "description": "Maximum expected value for this sensor type"
+        },
+        "is_within_range": {
+          "type": ["boolean", "null"],
+          "description": "Whether reading is within expected range"
+        },
+        "validation_flags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "out_of_range",
+              "sudden_change",
+              "sensor_fault",
+              "communication_error",
+              "calibration_drift",
+              "environmental_interference"
+            ]
+          },
+          "description": "Validation warning flags"
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "sensor_firmware_version": {
+          "type": ["string", "null"],
+          "maxLength": 50,
+          "description": "Firmware version of the sensor"
+        },
+        "data_collection_method": {
+          "type": ["string", "null"],
+          "enum": ["polling", "streaming", "event_driven", "batch"],
+          "description": "How the data was collected"
+        },
+        "sampling_rate_hz": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Sensor sampling rate in Hz"
+        },
+        "transmission_delay_ms": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Transmission delay in milliseconds"
+        }
+      },
+      "additionalProperties": false
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when record was created"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when record was last updated"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "description": "Reading timestamp must match partition date",
+      "if": {
+        "properties": {
+          "reading_timestamp": {"type": "string"}
+        }
+      },
+      "then": {
+        "properties": {
+          "reading_date": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "description": "Quality scores must be normalized",
+      "if": {
+        "properties": {
+          "quality": {
+            "properties": {
+              "confidence_score": {"type": "number"}
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "quality": {
+            "properties": {
+              "confidence_score": {
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "Anomaly scores must be normalized",
+      "if": {
+        "properties": {
+          "quality": {
+            "properties": {
+              "anomaly_score": {"type": "number"}
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "quality": {
+            "properties": {
+              "anomaly_score": {
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "Range validation consistency",
+      "if": {
+        "properties": {
+          "validation": {
+            "properties": {
+              "min_expected_value": {"type": "number"},
+              "max_expected_value": {"type": "number"}
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "validation": {
+            "properties": {
+              "min_expected_value": {
+                "type": "number"
+              },
+              "max_expected_value": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

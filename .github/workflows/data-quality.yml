@@ -1,0 +1,242 @@
+name: Data Quality Validation
+
+# Manual trigger and PR trigger - no push triggers as requested
+on:
+  workflow_dispatch:
+    inputs:
+      target_dataset:
+        description: 'Target BigQuery dataset to validate'
+        required: false
+        default: 'diagnosticpro_prod'
+      validation_level:
+        description: 'Validation level (quick, standard, comprehensive)'
+        required: false
+        default: 'standard'
+        type: choice
+        options:
+          - quick
+          - standard
+          - comprehensive
+      fail_on_warnings:
+        description: 'Fail the build on validation warnings'
+        required: false
+        default: false
+        type: boolean
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'NMD/**'
+      - '*.json'
+      - '*.yaml'
+      - '*.yml'
+      - 'bigquery_**'
+      - '.github/workflows/data-quality.yml'
+
+env:
+  GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp-key.json
+  PROJECT_ID: ${{ secrets.GCP_PROJECT || 'diagnostic-pro-start-up' }}
+  DEFAULT_DATASET: diagnosticpro_prod
+
+jobs:
+  data-quality-validation:
+    name: BigQuery Data Quality Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        validation-type: [schema, constraints, freshness]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Cache Python Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f NMD/requirements.txt ]; then
+            pip install -r NMD/requirements.txt
+          else
+            # Fallback dependencies
+            pip install google-cloud-bigquery>=3.11.0 jsonschema>=4.19.0 PyYAML>=6.0 tqdm>=4.65.0
+          fi
+
+      - name: Authenticate to Google Cloud
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          if [ -z "$GCP_SA_KEY" ]; then
+            echo "❌ GCP_SA_KEY secret not configured - using Application Default Credentials"
+            echo "Set up service account key in repository secrets for production use"
+            exit 0
+          fi
+          echo "$GCP_SA_KEY" | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS
+          gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS --quiet
+          gcloud config set project $PROJECT_ID
+
+      - name: Verify BigQuery Access
+        run: |
+          # Test BigQuery connectivity
+          python3 -c "
+          from google.cloud import bigquery
+          client = bigquery.Client(project='$PROJECT_ID')
+          try:
+              datasets = list(client.list_datasets(max_results=1))
+              print('✅ BigQuery connectivity verified')
+          except Exception as e:
+              print(f'❌ BigQuery connection failed: {e}')
+              exit(1)
+          "
+
+      - name: Set Validation Parameters
+        run: |
+          # Set parameters based on trigger type and inputs
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VALIDATION_LEVEL=${{ github.event.inputs.validation_level }}" >> $GITHUB_ENV
+            echo "TARGET_DATASET=${{ github.event.inputs.target_dataset }}" >> $GITHUB_ENV
+            echo "FAIL_ON_WARNINGS=${{ github.event.inputs.fail_on_warnings }}" >> $GITHUB_ENV
+          else
+            echo "VALIDATION_LEVEL=quick" >> $GITHUB_ENV
+            echo "TARGET_DATASET=diagnosticpro_prod" >> $GITHUB_ENV
+            echo "FAIL_ON_WARNINGS=false" >> $GITHUB_ENV
+          fi
+
+      - name: Run JSON Schema Validation
+        if: matrix.validation-type == 'schema'
+        run: |
+          cd NMD
+          echo "🔍 Running JSON Schema Validation..."
+          python3 S4_runner.py \
+            --mode schema \
+            --project-id $PROJECT_ID \
+            --dataset $TARGET_DATASET \
+            --validation-level $VALIDATION_LEVEL \
+            --output-format github \
+            --verbose
+
+      - name: Run SQL Constraint Checks
+        if: matrix.validation-type == 'constraints'
+        run: |
+          cd NMD
+          echo "🔍 Running SQL Constraint Validation..."
+          python3 S4_runner.py \
+            --mode constraints \
+            --project-id $PROJECT_ID \
+            --dataset $TARGET_DATASET \
+            --validation-level $VALIDATION_LEVEL \
+            --output-format github \
+            --verbose
+
+      - name: Run Freshness Validation
+        if: matrix.validation-type == 'freshness'
+        run: |
+          cd NMD
+          echo "🔍 Running Data Freshness Validation..."
+          python3 S4_runner.py \
+            --mode freshness \
+            --project-id $PROJECT_ID \
+            --dataset $TARGET_DATASET \
+            --validation-level $VALIDATION_LEVEL \
+            --output-format github \
+            --verbose \
+            --allow-soft-failures
+
+      - name: Generate Validation Summary
+        if: always()
+        run: |
+          cd NMD
+          echo "📊 Generating validation summary..."
+          python3 S4_runner.py \
+            --mode summary \
+            --project-id $PROJECT_ID \
+            --dataset $TARGET_DATASET \
+            --output-format github
+
+      - name: Upload Validation Reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: validation-reports-${{ matrix.validation-type }}
+          path: |
+            NMD/validation_*.json
+            NMD/validation_*.html
+            NMD/*_report_*.md
+          retention-days: 30
+
+      - name: Comment PR with Results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // Look for validation summary files
+            const summaryFiles = ['NMD/validation_summary.md', 'NMD/validation_report.md'];
+            let summary = '## 🔍 Data Quality Validation Results\n\n';
+
+            for (const file of summaryFiles) {
+              if (fs.existsSync(file)) {
+                summary += fs.readFileSync(file, 'utf8') + '\n';
+                break;
+              }
+            }
+
+            if (summary.length < 100) {
+              summary += `Validation completed for dataset: \`${{ env.TARGET_DATASET }}\`\n`;
+              summary += `Validation type: \`${{ matrix.validation-type }}\`\n`;
+              summary += `Check the Actions logs for detailed results.`;
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+      - name: Cleanup Credentials
+        if: always()
+        run: |
+          if [ -f "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
+            rm -f $GOOGLE_APPLICATION_CREDENTIALS
+          fi
+
+  validation-summary:
+    name: Validation Summary
+    needs: data-quality-validation
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Check Validation Results
+        run: |
+          echo "🎯 Data Quality Validation Summary:"
+          echo "- Schema validation: ${{ needs.data-quality-validation.result }}"
+
+          # Determine overall status
+          if [[ "${{ needs.data-quality-validation.result }}" =~ "failure" ]]; then
+            echo "❌ Data quality validation failed"
+            exit 1
+          elif [[ "${{ needs.data-quality-validation.result }}" =~ "success" ]]; then
+            echo "✅ All data quality validations passed"
+          else
+            echo "⚠️ Validation completed with warnings"
+          fi
