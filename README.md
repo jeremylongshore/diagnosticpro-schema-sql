@@ -1,6 +1,8 @@
 # Diag Schema SQL
 Production data contracts, lineage, validators, and migration kit for DiagnosticPro.
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U5S225PTME)
+
 ## Datasets
 - **Staging:** `repair_diagnostics`
 - **Production:** `diagnosticpro_prod`
